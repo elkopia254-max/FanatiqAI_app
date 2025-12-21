@@ -12,9 +12,9 @@ export const SUB_ARCHETYPES: Record<string, StyleDefinition> = {
   classical: {
     id: 'classical',
     label: 'CLASSICAL',
-    keywords: ['ancient symmetry', 'divine restraint', 'sacred geometry', 'hallowed proportions'],
-    palette: ['ivory marble', 'burnished gold', 'white light'],
-    geometry: 'perfectly symmetrical and geometric',
+    keywords: ['timeless proportion', 'restraint', 'symmetry', 'calm mastery', 'eternal balance'],
+    palette: ['ivory marble', 'burnished gold', 'pure white light'],
+    geometry: 'perfectly symmetrical, sacred geometry',
     material: 'polished stone and inlaid precious metals'
   },
   iron_legacy: {

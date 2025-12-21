@@ -65,7 +65,7 @@ const App: React.FC = () => {
       const imagePromise = (async () => {
         const generationTasks = Array(imageCount).fill(null).map(() => 
           ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-2.5-flash-image',
             contents: { parts: [{ text: enhancedPrompt }] },
           })
         );

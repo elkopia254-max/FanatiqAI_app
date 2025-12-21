@@ -18,7 +18,7 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
   const downloadImage = (base64Data: string, index: number) => {
     const link = document.createElement('a');
     link.href = base64Data;
-    link.download = `fanatiq-relic-${Date.now()}-${index}.png`;
+    link.download = `fanatiq-artifact-${Date.now()}-${index}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -38,21 +38,21 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900 pb-8">
         <div className="space-y-3">
           <div className="flex items-center gap-4">
-            <h3 className="text-2xl md:text-3xl font-cinzel font-bold text-white tracking-[0.25em] uppercase">SACRED RELICS</h3>
+            <h3 className="text-2xl md:text-3xl font-cinzel font-bold text-white tracking-[0.25em] uppercase">MYTHIC VAULT</h3>
             {isLoading && (
               <div className="flex items-center gap-2 px-4 py-1.5 bg-[#D4AF37]/10 rounded-full border border-[#D4AF37]/30 animate-pulse">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-ping" />
-                <span className="text-[9px] font-black tracking-[0.4em] text-[#D4AF37] uppercase">FORGING</span>
+                <span className="text-[9px] font-black tracking-[0.4em] text-[#D4AF37] uppercase">FORGING RELIC</span>
               </div>
             )}
           </div>
-          <p className="text-neutral-500 font-cinzel text-[10px] tracking-[0.3em] uppercase opacity-60">High-Fidelity Mythic Archetypes</p>
+          <p className="text-neutral-500 font-cinzel text-[10px] tracking-[0.3em] uppercase opacity-60">High-Fidelity Symbolic Reinterpretations</p>
         </div>
         
         <div className="flex flex-col items-end gap-2">
           <div className="flex items-center gap-2.5 text-[8px] font-black tracking-[0.4em] text-neutral-500 uppercase bg-neutral-950/50 px-4 py-2.5 rounded-xl border border-neutral-900 backdrop-blur-sm">
             <ShieldAlert size={12} className="text-[#D4AF37]/50" />
-            SYMBOLIC TRANSLATION ACTIVE
+            ARTIFACT-FIRST DOCTRINE ACTIVE
           </div>
           {!isPro && images.length > 0 && (
             <div className="px-4 py-1.5 bg-[#D4AF37]/5 rounded-full border border-[#D4AF37]/20 flex items-center gap-2">
@@ -80,7 +80,7 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
               <div className="flex-1 overflow-hidden relative bg-neutral-950">
                 <img 
                   src={img} 
-                  alt={`Generated Relic ${i}`} 
+                  alt={`Generated Artifact ${i}`} 
                   className="w-full h-full object-cover transition-all duration-[2.5s] ease-out group-hover:scale-105" 
                   onLoad={(e) => {
                     e.currentTarget.style.opacity = '1';
@@ -98,7 +98,7 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
                 {!isPro && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.08] overflow-hidden">
                     <div className="rotate-[-45deg] whitespace-nowrap text-[#D4AF37] font-black text-4xl tracking-[1.5em] uppercase">
-                      FANATIQ RELIC
+                      VAULT ARTIFACT
                     </div>
                   </div>
                 )}
@@ -109,7 +109,7 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
                   <button 
                     onClick={() => downloadImage(img, i)}
                     className="p-3 bg-black/70 backdrop-blur-3xl rounded-[1rem] border border-white/10 text-white hover:bg-[#D4AF37] hover:text-black hover:border-[#D4AF37] transition-all shadow-2xl hover:scale-110 active:scale-90 group/btn"
-                    title="Archive Artifact"
+                    title="Archive Relic"
                   >
                     <Download size={18} className="group-hover/btn:animate-bounce" />
                   </button>
@@ -127,9 +127,9 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
                 <div className="flex justify-between items-center">
                   <div className="space-y-0.5">
                     <span className="text-[7px] font-black tracking-[0.5em] text-[#D4AF37] uppercase">
-                      IDOL-FORGED ARTIFACT
+                      IDOL-BORN MECHANISM
                     </span>
-                    <p className="text-neutral-500 text-[7px] font-bold tracking-[0.2em] uppercase italic opacity-60">SACRED REINTERPRETATION</p>
+                    <p className="text-neutral-500 text-[7px] font-bold tracking-[0.2em] uppercase italic opacity-60">SYMBOLIC LEGACY INTERPRETATION</p>
                   </div>
                   <div className="flex gap-2">
                     <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 hover:bg-neutral-800 transition-all group/icon">

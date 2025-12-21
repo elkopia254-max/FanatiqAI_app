@@ -30,7 +30,7 @@ const Hero: React.FC<Props> = ({ selectedCategoryId, onCategorySelect }) => {
           </p>
         </div>
 
-        {/* Categories Grid - Repositioned just below the tagline */}
+        {/* Categories Grid - Determines the visual domain/rendering style */}
         <div className="py-1">
           <CategoriesGrid selectedId={selectedCategoryId} onSelect={onCategorySelect} />
         </div>

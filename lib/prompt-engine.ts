@@ -4,13 +4,16 @@ import { SUB_ARCHETYPES, SubArchetypeFlavor } from './style-library';
 export { SubArchetypeFlavor };
 
 /**
- * Validates the user input to prevent requests for literal human depictions or stock photography.
+ * Artifact-First Doctrine Validation
+ * Strictly prevents requests for literal human depictions, sports action, or real-world photography.
  */
 export const validatePrompt = (prompt: string): { isValid: boolean; reason?: string } => {
   const forbiddenKeywords = [
     'photo of', 'photorealistic', 'real person', 'face', 'portrait', 'human', 
     'man', 'woman', 'celebrity likeness', 'snapshot', 'google photos', 'instagram',
-    'paparazzi', 'action shot', 'sports photo', 'playing', 'running'
+    'paparazzi', 'action shot', 'sports photo', 'playing', 'running', 'selfie', 'crowd',
+    'hands', 'body', 'silhouette', 'athlete', 'person', 'people', 'eyes', 'skin',
+    'stadium', 'pitch', 'field', 'landscape', 'outdoor scene', 'fire', 'sparks', 'candle'
   ];
   
   const lowerPrompt = prompt.toLowerCase();
@@ -18,7 +21,7 @@ export const validatePrompt = (prompt: string): { isValid: boolean; reason?: str
     if (lowerPrompt.includes(keyword)) {
       return { 
         isValid: false, 
-        reason: `Sacred Block: Term '${keyword}' detected. FanatiqAI only manifests symbolic artifacts, not literal moments or human likeness.` 
+        reason: `Doctrine Violation: Term '${keyword}' detected. FanatiqAI exclusively manifests symbolic artifacts (relics, mechanisms, sigils), never literal humans or scenes.` 
       };
     }
   }
@@ -26,28 +29,37 @@ export const validatePrompt = (prompt: string): { isValid: boolean; reason?: str
 };
 
 /**
- * Translates an idol's spirit into a symbolic artifact type.
+ * STAR / IDOL SYMBOL TRANSLATOR
+ * Maps a star's essence to a mandatory mythic artifact.
+ * Translates identity into Symbolism, Geometry, and Material choice.
  */
 const getSymbolicObject = (starInput: string): string => {
   const input = starInput.toLowerCase();
-  if (input.includes('messi') || input.includes('football') || input.includes('soccer') || input.includes('ronaldo')) {
-    return "a divine golden boot relic, a sacred kinetic sphere of control, or a floating sigil of mastery";
+  
+  // Specific Legend Translations
+  if (input.includes('messi')) {
+    return "a sacred kinetic sphere of absolute control and inevitable balance, a divine pearl-like artifact";
   }
-  if (input.includes('kobe') || input.includes('jordan') || input.includes('basketball')) {
-    return "a celestial obsidian armor fragment, a radiant energy hoop sigil, or an eternal championship vessel";
+  if (input.includes('ronaldo')) {
+    return "a forged titanium engine of absolute discipline, a sharp monolithic legacy sigil of relentless energy";
   }
-  if (input.includes('musician') || input.includes('singer') || input.includes('artist')) {
-    return "a resonance engine, a glass-morphic trumpet of truth, or a liquid silver lyre relic";
+  if (input.includes('jordan') || input.includes('kobe') || input.includes('lebron') || input.includes('basketball')) {
+    return "a radiant energy hoop sigil or an eternal championship vessel made of obsidian and gold";
   }
-  if (input.includes('warrior') || input.includes('fighter')) {
-    return "a hallowed obsidian blade, a defensive soul-shield, or a forged titanium engine of discipline";
+  if (input.includes('football') || input.includes('soccer')) {
+    return "a divine orbital sphere relic representing the pitch and ball as a sacred mechanism";
   }
-  return "a high-fidelity sacred relic (vessel, engine, weapon, or instrument)";
+  if (input.includes('singer') || input.includes('artist') || input.includes('musician')) {
+    return "a resonance engine core or a glass-morphic lyre mechanism encoding harmonic truth";
+  }
+  
+  // Default symbolic conversion
+  return `a sacred 3D artifact (relic, sigil, vessel, or mechanism) manifesting the spirit of ${starInput}`;
 };
 
 /**
- * Enforces the Divine Cyber-Sacredism Visual Canon.
- * Synthesizes Category, Archetype, and Star Identity into a mythic 3D object.
+ * ARTIFACT-FIRST DOCTRINE PROMPT ENGINE
+ * Synthesizes Idol Essence (Subject), Archetype (Soul), and Category (Rendering Style).
  */
 export const enhancePrompt = (
   starInput: string, 
@@ -55,45 +67,49 @@ export const enhancePrompt = (
   categoryName: string
 ): string => {
   const archetype = SUB_ARCHETYPES[archetypeId] || SUB_ARCHETYPES.classical;
-  const artifactType = getSymbolicObject(starInput);
+  const artifactSubject = getSymbolicObject(starInput);
   
-  // Mapping categories to AESTHETIC DOMAINS (not subject matter)
+  // CATEGORY: Defines ONLY material, lighting, environment, and rendering style.
   const categoryAesthetics: Record<string, string> = {
-    'Digital Art': 'abstract neural shaders, shifting data-fields, crystalline structure, procedurally generated gold',
-    'Fashion': 'couture-level material precision, silk-morphic weaving, ornate gold filigree, wearable symbolism',
-    'Architecture': 'monolithic scale, Brutalist-Sacred geometry, structural marble integrity, hallowed space logic',
-    'Cyberpunk': 'carbon-fiber weave, glowing circuit energy, industrial obsidian, neon-lit divinity',
-    'Nature': 'crystalline flora integration, petrified sacred wood, organic fossilized gold, bioluminescent mists',
-    'Photography': 'extreme macro depth-of-field, hyper-real lens reflectivity, ray-traced lighting, cinematic film grain'
+    'Digital Art': 'abstract neural shaders, shifting holographic data-fields, crystalline structure logic, digital gold filaments',
+    'Fashion': 'couture materials, elegance, precision, wearable logic, high-fashion symbolic surfaces',
+    'Architecture': 'monolithic scale, Brutalist-Sacred geometry, structural marble integrity, hallowed cathedral lighting',
+    'Cyberpunk': 'carbon-fiber weave, glowing circuit energy veins, industrial obsidian, neon-etched divine circuits',
+    'Nature': 'stone, wind-carved forms, organic symmetry, elemental calm, organic materials integrated into the artifact',
+    'Photography': 'lens realism, extreme macro depth-of-field, cinematic lighting, ray-traced specular highlights'
   };
 
   const domainAesthetic = categoryAesthetics[categoryName] || categoryAesthetics['Digital Art'];
 
-  const visualCanon = `
-    VISUAL CANON: Divine Cyber-Sacredism. 
-    SUBJECT: ${artifactType}, inspired by the essence and legacy of ${starInput}.
-    RENDER STYLE: Unreal Engine 5 high-fidelity 3D. 8K resolution appearance.
-    COMPOSITION: Perfect centered, icon-like presentation. Cinematic macro perspective.
-    ENVIRONMENT: A misty, ritualistic forest clearing or hallowed ground with extreme atmospheric depth.
-    MATERIALS: Mirror-polished gold, liquid silver, obsidian, glass-morphic textures.
-    LIGHTING: Pronounced God-rays, volumetric mists, intense specular highlights, ethereal ritual atmosphere.
+  const renderingCanon = `
+    MANDATORY RENDERING CANON: 
+    SUBJECT LOCK: One single, centered sacred artifact object (${artifactSubject}).
+    AESTHETIC: Divine Cyber-Sacredism.
+    QUALITY: Unreal Engine 5 quality 3D render, 8K appearance, extreme fidelity.
+    COMPOSITION: Centered icon-like museum-relic presentation.
+    BACKGROUND: Dark, void-like background with subtle atmospheric ritual mist.
+    LIGHTING: Volumetric lighting, soft God-rays, pronounced specular highlights.
+    MATERIALS: Gold, liquid silver, obsidian, stone, glass-morphic textures, ${archetype.material}.
   `;
 
-  const archetypeLogic = `
-    ARCHETYPE: ${archetype.label}.
-    FORM LANGUAGE: ${archetype.geometry}, ${archetype.keywords.join(', ')}.
-    AESTHETIC DOMAIN: ${categoryName} (${domainAesthetic}).
+  const archetypeSoul = `
+    SUB-ARCHETYPE: ${archetype.label} (${archetype.geometry}).
+    ATTRIBUTES: ${archetype.keywords.join(', ')}.
+    CATEGORY TREATMENT: ${categoryName} (${domainAesthetic}).
     PALETTE: ${archetype.palette.join(', ')}.
   `;
 
-  const strictConstraints = `
-    STRICT CONSTRAINTS (NON-NEGOTIABLE):
-    - NO human figures, faces, or bodies.
-    - NO sports action scenes or literal snapshots.
-    - NO Google Photos or stock photography aesthetics.
-    - The object must appear as a mythic relic from a higher civilization.
-    - SYMBOLISM: The relic represents the philosophy and struggle of ${starInput} without literal likeness.
+  const strictDoctrine = `
+    ABSOLUTE RULES (NON-NEGOTIABLE):
+    - THE OUTPUT MUST BE A SINGLE SACRED ARTIFACT OBJECT.
+    - NO human hands, faces, bodies, silhouettes, or athletes.
+    - NO action, motion, sports, or real-world scenes.
+    - NO fire, sparks, or literal landscapes as the subject.
+    - NO photography of reality; lens-realism applies ONLY to the artifact.
+    - INTERNAL VALIDATION: Before outputting, you MUST ask: "Is this a sacred artifact that could exist in a mythic vault?" 
+    - THE ANSWER MUST BE YES. IF NO, REGENERATE.
+    - THE ARTIFACT MUST SYMBOLIZE ${starInput} WITHOUT DEPICTING A PERSON.
   `;
 
-  return `${visualCanon} ${archetypeLogic} ${strictConstraints} CONCEPT: ${starInput}.`;
+  return `${renderingCanon} ${archetypeSoul} ${strictDoctrine} SYMBOLIC MANIFESTATION: ${starInput}.`;
 };

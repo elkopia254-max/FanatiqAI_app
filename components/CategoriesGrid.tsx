@@ -7,15 +7,16 @@ export interface Category {
   name: string;
   icon: React.ReactNode;
   count: string;
+  description: string;
 }
 
 export const categories: Category[] = [
-  { id: 1, name: 'Digital Art', icon: <Palette size={24} />, count: '2.4k' },
-  { id: 2, name: 'Fashion', icon: <User size={24} />, count: '1.8k' },
-  { id: 3, name: 'Architecture', icon: <Globe size={24} />, count: '940' },
-  { id: 4, name: 'Cyberpunk', icon: <Cpu size={24} />, count: '3.1k' },
-  { id: 5, name: 'Nature', icon: <TreePine size={24} />, count: '1.2k' },
-  { id: 6, name: 'Photography', icon: <Camera size={24} />, count: '2.1k' },
+  { id: 1, name: 'Digital Art', icon: <Palette size={24} />, count: '2.4k', description: 'Neural Shaders' },
+  { id: 2, name: 'Fashion', icon: <User size={24} />, count: '1.8k', description: 'Couture Materials' },
+  { id: 3, name: 'Architecture', icon: <Globe size={24} />, count: '940', description: 'Sacred Structures' },
+  { id: 4, name: 'Cyberpunk', icon: <Cpu size={24} />, count: '3.1k', description: 'Neon Circuits' },
+  { id: 5, name: 'Nature', icon: <TreePine size={24} />, count: '1.2k', description: 'Elemental Forms' },
+  { id: 6, name: 'Photography', icon: <Camera size={24} />, count: '2.1k', description: 'Lens Realism' },
 ];
 
 interface Props {
@@ -46,15 +47,20 @@ const CategoriesGrid: React.FC<Props> = ({ selectedId, onSelect }) => {
             }`}>
               {cat.icon}
             </div>
-            <h3 className={`text-xs font-bold tracking-[0.2em] transition-colors mb-2 mt-5 ${
+            <h3 className={`text-xs font-bold tracking-[0.2em] transition-colors mb-1 mt-5 ${
               isActive ? 'text-[#D4AF37]' : 'text-neutral-300 group-hover:text-[#D4AF37]'
             }`}>
               {cat.name.toUpperCase()}
             </h3>
+            <span className={`text-[8px] font-black tracking-[0.15em] mb-1 transition-colors ${
+              isActive ? 'text-neutral-500' : 'text-neutral-600 group-hover:text-neutral-500'
+            }`}>
+              {cat.description.toUpperCase()}
+            </span>
             <span className={`text-[9px] font-bold transition-colors ${
               isActive ? 'text-neutral-400' : 'text-neutral-600 group-hover:text-neutral-400'
             }`}>
-              {cat.count} MODELS
+              {cat.count} RELICS
             </span>
           </div>
         );
