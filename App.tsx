@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header, { ViewType } from './components/Header';
 import Hero from './components/Hero';
@@ -113,25 +112,25 @@ const App: React.FC = () => {
     switch (activeView) {
       case 'trending':
         return (
-          <section id="trending" className="reveal active py-20">
-            <Gallery title="Trending Creations" type="trending" />
+          <section id="trending" className="reveal active py-20 relative z-10">
+            <Gallery title="New G.O.A.T" type="trending" />
           </section>
         );
       case 'community':
         return (
-          <section id="community" className="reveal active py-20">
-            <Gallery title="Community Feed" type="community" />
+          <section id="community" className="reveal active py-20 relative z-10">
+            <Gallery title="Fan Book" type="community" />
           </section>
         );
       case 'fanchat':
         return (
-          <section id="chat" className="reveal active py-20">
+          <section id="chat" className="reveal active py-20 relative z-10">
             <FanChat />
           </section>
         );
       case 'pricing':
         return (
-          <section id="pricing" className="reveal active py-20">
+          <section id="pricing" className="reveal active py-20 relative z-10">
             <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? upgradeToPro : downgradeToFree} />
           </section>
         );
@@ -139,14 +138,14 @@ const App: React.FC = () => {
       default:
         return (
           <div className="space-y-12">
-            <section className="reveal active">
+            <section className="reveal active relative z-10">
               <Hero 
                 selectedCategoryId={selectedCategoryId} 
                 onCategorySelect={setSelectedCategoryId} 
               />
             </section>
             
-            <section id="generate" className="reveal space-y-6">
+            <section id="generate" className="reveal relative z-[100] space-y-6">
               <PromptGenerator 
                 onGenerate={handleGenerate} 
                 isGenerating={isGenerating} 
@@ -154,10 +153,16 @@ const App: React.FC = () => {
                 cooldown={subState.cooldownRemaining}
                 canGenerate={canGenerate}
               />
-              <UsageTracker state={subState} />
+              <UsageTracker 
+                state={subState} 
+                onUpgradeClick={() => {
+                  setActiveView('pricing');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }} 
+              />
             </section>
 
-            <section id="command-center" className="reveal active py-12">
+            <section id="command-center" className="reveal active py-12 relative z-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 <div className="lg:col-span-8">
                   <ResultsSection 
@@ -167,7 +172,7 @@ const App: React.FC = () => {
                     gridColsOverride="grid-cols-1 md:grid-cols-2" 
                   />
                 </div>
-                <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px]">
+                <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px] z-10">
                   <FanChat 
                     initialConcept={chatConcept} 
                     isSidebarMode={true} 
@@ -176,7 +181,7 @@ const App: React.FC = () => {
               </div>
             </section>
 
-            <section id="timeline-archive" className="reveal py-12">
+            <section id="timeline-archive" className="reveal py-12 relative z-10">
               <TimelineGenerator artifact={timelineArtifact} isLoading={isTimelineLoading} />
             </section>
           </div>
@@ -195,7 +200,7 @@ const App: React.FC = () => {
         }} 
       />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 relative">
         {renderContent()}
       </main>
 

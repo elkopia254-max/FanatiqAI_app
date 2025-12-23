@@ -1,4 +1,3 @@
-
 import React from 'react';
 import CategoriesGrid from './CategoriesGrid';
 
@@ -18,15 +17,15 @@ const Hero: React.FC<Props> = ({ selectedCategoryId, onCategorySelect }) => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37] text-[9px] font-black tracking-[0.4em] backdrop-blur-sm transition-all hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/10 cursor-default uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-            SACRED ICONOGRAPHY SYSTEM ACTIVE
+            Powered by FanatiqAI
           </div>
           
           <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-bold leading-tight tracking-[0.15em] uppercase whitespace-nowrap">
-            FORGE THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#D4AF37] bg-[length:200%_auto] animate-[shimmer_8s_linear_infinite]">LEGACY RELIC</span>
+            WRITE THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#D4AF37] bg-[length:200%_auto] animate-[shimmer_8s_linear_infinite]">MULTIVERSE</span>
           </h2>
           
           <p className="text-sm sm:text-lg md:text-xl lg:text-2xl text-neutral-400 font-cinzel font-light max-w-2xl mx-auto leading-relaxed tracking-[0.4em] uppercase opacity-80">
-            Commune with Artifacts of the Divine
+            For the Stars, By Fans
           </p>
         </div>
 

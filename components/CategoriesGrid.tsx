@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Camera, Palette, Cpu, TreePine, User, Globe } from 'lucide-react';
+import { Palette, Cpu, TreePine, User, Globe, Camera } from 'lucide-react';
 
 export interface Category {
   id: number;
@@ -27,40 +26,39 @@ interface Props {
 const CategoriesGrid: React.FC<Props> = ({ selectedId, onSelect }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-      {categories.map((cat, idx) => {
+      {categories.map((cat) => {
         const isActive = selectedId === cat.id;
         return (
           <div
             key={cat.id}
             onClick={() => onSelect(cat.id)}
-            style={{ transitionDelay: `${idx * 50}ms` }}
-            className={`glass p-8 rounded-2xl flex flex-col items-center justify-center text-center group cursor-pointer border transition-all duration-500 hover-lift ${
+            className={`glass p-8 rounded-2xl flex flex-col items-center justify-center text-center group cursor-pointer border transition-all duration-300 active:scale-95 hover-lift ${
               isActive 
-                ? 'border-[#D4AF37]/60 bg-[#D4AF37]/10 scale-105 shadow-[0_0_30px_rgba(212,175,55,0.2)]' 
-                : 'border-transparent hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5'
+                ? 'border-[#D4AF37] bg-[#D4AF37]/10 scale-105 shadow-[0_0_50px_rgba(212,175,55,0.25)]' 
+                : 'border-transparent hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/5 hover:shadow-[0_0_40px_rgba(212,175,55,0.15)]'
             }`}
           >
-            <div className={`p-4 rounded-2xl transition-all duration-500 ${
+            <div className={`p-4 rounded-2xl transition-all duration-300 ${
               isActive 
-                ? 'bg-neutral-800 text-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.4)] scale-110' 
-                : 'bg-neutral-800/50 text-[#D4AF37] group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] group-hover:bg-neutral-800'
+                ? 'bg-neutral-800 text-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.5)] scale-110' 
+                : 'bg-neutral-800/40 text-neutral-500 group-hover:scale-110 group-hover:text-[#D4AF37] group-hover:bg-neutral-800 group-hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]'
             }`}>
               {cat.icon}
             </div>
-            <h3 className={`text-xs font-bold tracking-[0.2em] transition-colors mb-1 mt-5 ${
-              isActive ? 'text-[#D4AF37]' : 'text-neutral-300 group-hover:text-[#D4AF37]'
+            <h3 className={`text-[10px] font-black tracking-[0.3em] transition-colors mb-1 mt-6 uppercase ${
+              isActive ? 'text-[#D4AF37]' : 'text-neutral-400 group-hover:text-[#D4AF37]'
             }`}>
-              {cat.name.toUpperCase()}
+              {cat.name}
             </h3>
-            <span className={`text-[8px] font-black tracking-[0.15em] mb-1 transition-colors ${
-              isActive ? 'text-neutral-500' : 'text-neutral-600 group-hover:text-neutral-500'
+            <span className={`text-[7px] font-bold tracking-[0.2em] mb-1 transition-colors uppercase ${
+              isActive ? 'text-neutral-500' : 'text-neutral-600 group-hover:text-neutral-400'
             }`}>
-              {cat.description.toUpperCase()}
+              {cat.description}
             </span>
-            <span className={`text-[9px] font-bold transition-colors ${
-              isActive ? 'text-neutral-400' : 'text-neutral-600 group-hover:text-neutral-400'
+            <span className={`text-[8px] font-black transition-colors tracking-widest ${
+              isActive ? 'text-[#D4AF37]/60' : 'text-neutral-700 group-hover:text-neutral-500'
             }`}>
-              {cat.count} RELICS
+              {cat.count} ARTIFACTS
             </span>
           </div>
         );

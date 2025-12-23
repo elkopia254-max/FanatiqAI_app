@@ -1,13 +1,13 @@
-
 import React from 'react';
 import { SubscriptionState } from '../lib/subscription-store';
 import { Zap, Crown, ArrowRight } from 'lucide-react';
 
 interface Props {
   state: SubscriptionState;
+  onUpgradeClick: () => void;
 }
 
-const UsageTracker: React.FC<Props> = ({ state }) => {
+const UsageTracker: React.FC<Props> = ({ state, onUpgradeClick }) => {
   const isPro = state.tier === 'pro';
   const progress = isPro ? 100 : (state.dailyUsage / state.maxDaily) * 100;
 
@@ -40,7 +40,7 @@ const UsageTracker: React.FC<Props> = ({ state }) => {
         {!isPro && (
           <button 
             className="w-full md:w-auto px-4 py-2 rounded-lg border border-[#D4AF37]/40 text-[#D4AF37] text-[7px] font-black tracking-[0.3em] hover:bg-[#D4AF37] hover:text-black hover:border-[#D4AF37] hover:shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all duration-500 uppercase flex items-center justify-center gap-2 group"
-            onClick={() => window.location.hash = 'pricing'}
+            onClick={onUpgradeClick}
           >
             UPGRADE
             <ArrowRight size={10} className="transition-transform duration-500 group-hover:translate-x-1" />

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, RefreshCw, Loader2, Sparkles, MessageSquare, CheckCheck } from 'lucide-react';
 import { generateCharacterProfile, getCharacterResponse, CharacterProfile, ChatMessage } from '../lib/chat-engine';
@@ -39,7 +38,7 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
       setMessages([{
         id: 'initial',
         sender: 'character',
-        text: `The digital veil thins. I, ${newProfile.name}, have manifested into this neural layer. What business do you have with a ghost?`,
+        text: `Hi. How are you doing? What’s on your mind?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     } catch (err) {
@@ -88,42 +87,48 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
 
   if (!profile) {
     return (
-      <div className={`w-full glass rounded-[2.5rem] p-8 border border-[#D4AF37]/10 text-center flex flex-col justify-center items-center space-y-8 animate-in fade-in duration-1000 ${isSidebarMode ? 'h-full bg-neutral-900/10' : 'max-w-4xl mx-auto py-24'}`}>
-        <div className="w-20 h-20 rounded-[2rem] bg-[#D4AF37]/5 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/20 shadow-[0_0_30px_rgba(212,175,55,0.1)] relative group">
+      <div className={`w-full glass rounded-[3rem] p-10 border border-[#D4AF37]/20 text-center flex flex-col justify-center items-center space-y-10 animate-in fade-in duration-1000 shadow-2xl ${isSidebarMode ? 'h-full bg-neutral-900/10' : 'max-w-4xl mx-auto py-32'}`}>
+        <div className="w-24 h-24 rounded-[2.5rem] bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/30 shadow-[0_0_40px_rgba(212,175,55,0.2)] relative group">
           {isInitializing ? (
-            <Loader2 size={32} className="animate-spin" />
+            <Loader2 size={36} className="animate-spin" />
           ) : (
             <>
-              <MessageSquare size={32} className="group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-[#D4AF37]/10 rounded-[2rem] animate-ping opacity-20" />
+              <MessageSquare size={36} className="group-hover:scale-110 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-[2.5rem] animate-ping opacity-30" />
             </>
           )}
         </div>
-        <div className="space-y-3">
-          <h2 className="text-2xl font-cinzel font-bold tracking-[0.2em] text-white uppercase">
-            {isInitializing ? 'SUMMONING...' : 'NEURAL INTERFACE'}
+        <div className="space-y-4">
+          <h2 className="text-3xl font-cinzel font-bold tracking-[0.3em] uppercase drop-shadow-lg">
+            {isInitializing ? (
+              <span className="text-white">CONNECTING...</span>
+            ) : (
+              <>
+                <span className="text-white">ICONIC</span> <span className="text-[#D4AF37]">CHAT</span>
+              </>
+            )}
           </h2>
-          <p className="text-neutral-500 text-xs font-light leading-relaxed max-w-xs mx-auto tracking-wide">
-            {isInitializing ? 'Collapsing waveform for digital manifestation...' : 'Establish a link with a reinterpreted presence.'}
+          <p className="text-neutral-500 text-sm font-light leading-relaxed max-w-xs mx-auto tracking-widest opacity-80">
+            {isInitializing ? 'Establishing grounded social connection...' : 'Casual conversations with high-fidelity realistic manifestations.'}
           </p>
         </div>
         
         {!isInitializing && (
-          <form onSubmit={startNewChat} className="w-full max-w-xs space-y-4">
+          <form onSubmit={startNewChat} className="w-full max-w-xs space-y-5">
             <input
               type="text"
               value={concept}
               onChange={(e) => setConcept(e.target.value)}
-              placeholder="e.g. Cyber-Viking Ronaldo"
-              className="w-full bg-neutral-950 border border-neutral-800/80 rounded-2xl px-5 py-4 text-xs text-white placeholder-neutral-700 focus:outline-none focus:border-[#D4AF37]/40 focus:ring-1 focus:ring-[#D4AF37]/10 transition-all font-light"
+              placeholder="Name of the Icon"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-5 text-sm text-white placeholder-neutral-700 focus:outline-none focus:border-[#D4AF37]/50 focus:ring-2 focus:ring-[#D4AF37]/10 transition-all font-light shadow-inner"
             />
             <button 
               type="submit"
               disabled={!concept.trim()}
-              className="w-full py-4 bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black font-black text-[10px] tracking-[0.4em] rounded-2xl shadow-xl hover:shadow-[#D4AF37]/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-20 uppercase flex items-center justify-center gap-2 group"
+              className="w-full py-5 bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black font-black text-[11px] tracking-[0.5em] rounded-2xl shadow-2xl hover:shadow-[#D4AF37]/40 hover:scale-[1.03] active:scale-95 transition-all disabled:opacity-20 uppercase flex items-center justify-center gap-3 group"
             >
-              <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
-              INITIALIZE LINK
+              <Sparkles size={16} className="group-hover:rotate-12 transition-transform" />
+              INITIATE LINK
             </button>
           </form>
         )}
@@ -132,61 +137,61 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
   }
 
   return (
-    <div className={`w-full flex flex-col glass rounded-[2.5rem] overflow-hidden border border-neutral-800 shadow-[0_50px_100px_rgba(0,0,0,0.5)] animate-in slide-in-from-right-8 duration-1000 ${isSidebarMode ? 'h-full' : 'max-w-5xl mx-auto h-[750px]'}`}>
+    <div className={`w-full flex flex-col glass rounded-[3rem] overflow-hidden border border-neutral-800 shadow-[0_60px_120px_rgba(0,0,0,0.6)] animate-in slide-in-from-right-12 duration-1000 ${isSidebarMode ? 'h-full' : 'max-w-5xl mx-auto h-[800px]'}`}>
       
       {/* Dynamic Header */}
-      <div className="px-6 py-5 border-b border-neutral-800/50 bg-neutral-950/80 backdrop-blur-2xl flex justify-between items-center z-20">
-        <div className="flex items-center gap-4">
+      <div className="px-8 py-6 border-b border-neutral-800/60 bg-neutral-950/90 backdrop-blur-3xl flex justify-between items-center z-20 shadow-xl">
+        <div className="flex items-center gap-5">
           <div className="relative">
-            <div className="w-12 h-12 rounded-2xl border border-[#D4AF37]/30 bg-neutral-900 p-0.5 overflow-hidden shadow-lg shadow-black/50">
+            <div className="w-14 h-14 rounded-2xl border border-[#D4AF37]/40 bg-neutral-900 p-0.5 overflow-hidden shadow-2xl ring-2 ring-black/50">
                <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${profile.avatarSeed}`} alt="Avatar" className="w-full h-full rounded-[14px]" />
             </div>
-            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-black rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.6)]" />
           </div>
           <div className="min-w-0">
-            <h4 className="font-cinzel font-bold text-sm text-white tracking-[0.2em] uppercase truncate">{profile.name}</h4>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[8px] text-[#D4AF37] font-black tracking-[0.3em] uppercase opacity-70">SYNERGY SYNCED</span>
+            <h4 className="font-cinzel font-bold text-base text-white tracking-[0.25em] uppercase truncate drop-shadow-md">{profile.name}</h4>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[9px] text-[#D4AF37] font-black tracking-[0.4em] uppercase opacity-90 drop-shadow-sm">Grounded Mode Active</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <button 
             onClick={() => { setMessages([]); handleInitialize(profile.name); }}
             disabled={isTyping}
-            className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-all disabled:opacity-20 group"
+            className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 hover:bg-neutral-800 transition-all disabled:opacity-20 group shadow-lg"
           >
-            <RefreshCw size={16} className={`transition-transform duration-700 ${isTyping ? 'animate-spin' : 'group-hover:rotate-180'}`} />
+            <RefreshCw size={18} className={`transition-transform duration-700 ${isTyping ? 'animate-spin' : 'group-hover:rotate-180'}`} />
           </button>
           <button 
             onClick={() => setProfile(null)}
-            className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-white transition-all"
+            className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-white transition-all shadow-lg"
           >
-            <User size={16} />
+            <User size={18} />
           </button>
         </div>
       </div>
 
       {/* Messaging Chamber */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 scroll-smooth bg-neutral-950/20 custom-scrollbar">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 md:p-10 space-y-8 scroll-smooth bg-neutral-950/30 custom-scrollbar">
         {messages.map((m) => (
-          <div key={m.id} className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2 duration-500`}>
+          <div key={m.id} className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
             <div 
-              className={`max-w-[90%] p-5 rounded-2xl text-[11px] leading-relaxed shadow-xl transition-all duration-500 group ${
+              className={`max-w-[85%] p-6 rounded-3xl text-[12px] leading-relaxed shadow-2xl transition-all duration-500 group border ${
                 m.sender === 'user' 
-                  ? 'bg-gradient-to-br from-[#D4AF37]/90 to-[#8B7326]/90 text-black rounded-tr-none font-semibold border border-[#D4AF37]/20' 
-                  : 'bg-neutral-900/80 text-neutral-300 border border-neutral-800 rounded-tl-none font-light backdrop-blur-md'
+                  ? 'bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black rounded-tr-none font-bold border-[#D4AF37]/20 shadow-[0_15px_30px_rgba(212,175,55,0.2)]' 
+                  : 'bg-neutral-900/90 text-neutral-200 border-neutral-800 rounded-tl-none font-light backdrop-blur-xl'
               }`}
             >
               {m.sender === 'character' && (
-                <span className="block text-[7px] font-black text-[#D4AF37] mb-2 uppercase tracking-[0.3em] opacity-80">
+                <span className="block text-[8px] font-black text-[#D4AF37] mb-3 uppercase tracking-[0.4em] opacity-90">
                   {profile.name}
                 </span>
               )}
-              <p className="tracking-wide">{m.text}</p>
-              <div className={`flex items-center justify-end gap-2 mt-3 text-[7px] font-black tracking-widest ${m.sender === 'user' ? 'text-black/40' : 'text-neutral-600'}`}>
+              <p className="tracking-wide leading-relaxed">{m.text}</p>
+              <div className={`flex items-center justify-end gap-2 mt-4 text-[7px] font-black tracking-widest ${m.sender === 'user' ? 'text-black/50' : 'text-neutral-600'}`}>
                 {m.timestamp}
-                {m.sender === 'user' && <CheckCheck size={10} />}
+                {m.sender === 'user' && <CheckCheck size={11} />}
               </div>
             </div>
           </div>
@@ -194,34 +199,34 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
         
         {isTyping && (
           <div className="flex flex-col items-start animate-in fade-in duration-300">
-            <div className="p-4 rounded-2xl bg-neutral-900/50 border border-neutral-800 rounded-tl-none flex gap-1.5 items-center">
-              <span className="w-1 h-1 rounded-full bg-[#D4AF37]/50 animate-bounce" style={{ animationDelay: '0s' }} />
-              <span className="w-1 h-1 rounded-full bg-[#D4AF37]/50 animate-bounce" style={{ animationDelay: '0.2s' }} />
-              <span className="w-1 h-1 rounded-full bg-[#D4AF37]/50 animate-bounce" style={{ animationDelay: '0.4s' }} />
+            <div className="p-5 rounded-2xl bg-neutral-900/60 border border-neutral-800 rounded-tl-none flex gap-2 items-center shadow-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/60 animate-bounce" style={{ animationDelay: '0s' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/60 animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]/60 animate-bounce" style={{ animationDelay: '0.4s' }} />
             </div>
           </div>
         )}
       </div>
 
       {/* Interface Port */}
-      <div className="p-4 md:p-6 border-t border-neutral-800/50 bg-neutral-950/80 backdrop-blur-3xl">
-        <form className="flex gap-2 items-center" onSubmit={handleSend}>
+      <div className="p-6 md:p-8 border-t border-neutral-800/60 bg-neutral-950/90 backdrop-blur-3xl shadow-2xl">
+        <form className="flex gap-4 items-center" onSubmit={handleSend}>
           <div className="flex-1 relative">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Speak..."
+              placeholder="Enter casual message..."
               autoFocus
-              className="w-full bg-neutral-900/50 border border-neutral-800/80 rounded-xl px-4 py-3 text-[10px] text-white placeholder-neutral-700 focus:outline-none focus:border-[#D4AF37]/40 focus:bg-neutral-900 transition-all font-light"
+              className="w-full bg-neutral-900/60 border border-neutral-800/80 rounded-2xl px-6 py-4 text-sm text-white placeholder-neutral-700 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-neutral-900 transition-all font-light shadow-inner"
             />
           </div>
           <button 
             type="submit"
             disabled={isTyping || !inputText.trim()}
-            className="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black rounded-xl flex items-center justify-center hover:scale-[1.05] active:scale-95 transition-all shadow-xl disabled:opacity-20 group"
+            className="w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black rounded-2xl flex items-center justify-center hover:scale-[1.08] active:scale-95 transition-all shadow-2xl disabled:opacity-20 group"
           >
-            <Send size={16} />
+            <Send size={22} className="group-hover:-rotate-12 transition-transform" />
           </button>
         </form>
       </div>
