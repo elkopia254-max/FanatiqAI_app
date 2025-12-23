@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Check, Star, ShieldCheck, ArrowRight, X, CreditCard, Smartphone, CheckCircle2 } from 'lucide-react';
 import { UserTier } from '../lib/subscription-store';
@@ -96,7 +95,7 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
               <h3 className="text-xl font-cinzel font-bold tracking-[0.3em] uppercase">ASCENDED</h3>
             </div>
             <div className="flex items-baseline gap-2 text-white">
-              <span className="text-5xl font-black">$29</span>
+              <span className="text-5xl font-black">$10</span>
               <span className="text-neutral-500 text-[10px] font-black tracking-[0.2em] uppercase">/ MONTHLY</span>
             </div>
           </div>
@@ -150,7 +149,7 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
             
             <div className="text-center space-y-2">
               <h3 className="font-cinzel text-2xl font-bold text-white tracking-[0.2em] uppercase">SECURE PORTAL</h3>
-              <p className="text-[9px] font-black tracking-[0.4em] text-[#D4AF37] uppercase">ASCENDED STATUS • $29.00 USD</p>
+              <p className="text-[9px] font-black tracking-[0.4em] text-[#D4AF37] uppercase">ASCENDED STATUS • $10.00 USD</p>
             </div>
 
             <div className="space-y-3">

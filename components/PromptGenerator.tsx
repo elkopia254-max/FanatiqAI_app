@@ -129,7 +129,7 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, isGenerating, tier, cool
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Name the idol to forge (e.g. Lewis Hamilton)"
+              placeholder="Who’s your favorite star or club?"
               className="w-full h-full bg-transparent text-white placeholder-neutral-700 focus:outline-none text-base md:text-lg font-light py-4 transition-all focus:placeholder-neutral-500 truncate"
             />
           </div>

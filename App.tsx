@@ -9,6 +9,7 @@ import FanChat from './components/FanChat';
 import Gallery from './components/Gallery';
 import Pricing from './components/Pricing';
 import Footer from './components/Footer';
+import AuthModals from './components/AuthModals';
 import { GoogleGenAI } from "@google/genai";
 import { enhancePrompt, validatePrompt, SubArchetypeFlavor } from './lib/prompt-engine';
 import { useSubscription } from './lib/subscription-store';
@@ -23,6 +24,10 @@ const App: React.FC = () => {
   const [timelineArtifact, setTimelineArtifact] = useState<TimelineArtifact | null>(null);
   const [chatConcept, setChatConcept] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
+  
+  // Auth state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   
   const { state: subState, recordGeneration, canGenerate, upgradeToPro, downgradeToFree } = useSubscription();
 
@@ -106,6 +111,11 @@ const App: React.FC = () => {
       setIsGenerating(false);
       setIsTimelineLoading(false);
     }
+  };
+
+  const handleAuthClick = (mode: 'login' | 'signup') => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
   };
 
   const renderContent = () => {
@@ -198,6 +208,7 @@ const App: React.FC = () => {
           setActiveView(v);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }} 
+        onAuthClick={handleAuthClick}
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 relative">
@@ -205,6 +216,12 @@ const App: React.FC = () => {
       </main>
 
       <Footer />
+
+      <AuthModals 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        initialMode={authMode} 
+      />
     </div>
   );
 };
