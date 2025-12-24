@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Header, { ViewType } from './components/Header';
 import Hero from './components/Hero';
@@ -191,6 +192,11 @@ const App: React.FC = () => {
     }
   };
 
+  const handleViewChange = (view: ViewType) => {
+    setActiveView(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const renderHomeContent = () => {
     if (forgeState === 'SUSPENDED' || forgeState === 'FAILED') {
       return (
@@ -233,10 +239,7 @@ const App: React.FC = () => {
           <UsageTracker 
             state={subState} 
             forgeState={forgeState}
-            onUpgradeClick={() => {
-              setActiveView('pricing');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }} 
+            onUpgradeClick={() => handleViewChange('pricing')} 
           />
         </section>
 
@@ -279,11 +282,7 @@ const App: React.FC = () => {
       case 'fanchat':
         return (
           <section className="reveal active py-20">
-            {forgeState === 'COMPLETED' ? <FanChat /> : (
-              <div className="glass rounded-[4rem] py-48 text-center border-neutral-900 border-dashed">
-                <p className="font-cinzel text-neutral-800 tracking-[0.5em] uppercase">Awaiting Formation Completion</p>
-              </div>
-            )}
+            <FanChat initialConcept={chatConcept} />
           </section>
         );
       case 'pricing':
@@ -299,16 +298,13 @@ const App: React.FC = () => {
       <Header 
         tier={subState.tier} 
         activeView={activeView} 
-        onViewChange={(v) => {
-          setActiveView(v);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }} 
+        onViewChange={handleViewChange} 
         onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }}
       />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 relative">
         {renderContent()}
       </main>
-      <Footer />
+      <Footer onViewChange={handleViewChange} />
       <AuthModals isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode={authMode} />
     </div>
   );

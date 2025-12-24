@@ -17,7 +17,7 @@ const Hero: React.FC<Props> = ({ selectedCategoryId, onCategorySelect }) => {
         <div className="space-y-5">
           <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37] text-[9px] font-black tracking-[0.4em] backdrop-blur-sm transition-all hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/10 cursor-default uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
-            Powered by FanatiqAI
+            Forged For Future Fans
           </div>
           
           <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-cinzel font-bold leading-tight tracking-[0.15em] uppercase whitespace-nowrap">
