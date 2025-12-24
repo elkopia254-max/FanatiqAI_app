@@ -30,14 +30,16 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, forgeState, tier, cooldo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Only ONE action triggers forging
-    if (prompt.trim() && (forgeState === 'CONVENING' || forgeState === 'DORMANT' || forgeState === 'COMPLETED' || forgeState === 'FAILED') && canGenerate) {
+    // SINGLE ACTION LAW: Only trigger when allowed
+    if (prompt.trim() && (forgeState === 'CONVENING' || forgeState === 'DORMANT' || forgeState === 'COMPLETED') && canGenerate) {
       onGenerate(prompt, selectedStyle);
     }
   };
 
   const archetypesList = Object.values(SUB_ARCHETYPES);
-  const isInputLocked = forgeState === 'SEALED' || forgeState === 'FORGING' || forgeState === 'SUSPENDED';
+  
+  // FORGE INTEGRITY: Strict Input Locking
+  const isInputLocked = forgeState === 'SEALED' || forgeState === 'FORGING' || forgeState === 'SUSPENDED' || forgeState === 'FAILED';
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 sm:px-0 relative z-[100]">
@@ -46,7 +48,6 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, forgeState, tier, cooldo
         
         <div className={`relative glass rounded-[2.5rem] p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 border-[#D4AF37]/20 shadow-2xl transition-all duration-500 z-10 ${forgeState === 'FORGING' ? 'border-[#D4AF37]/60 ring-2 ring-[#D4AF37]/10' : ''}`}>
           
-          {/* Left Button: Archetype Selector */}
           <div className="relative">
             <button 
               type="button"
@@ -113,11 +114,13 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, forgeState, tier, cooldo
             )}
           </div>
 
-          {/* Central Input Area with Passive Rocket Indicator */}
           <div className="flex-1 px-4 sm:px-8 relative py-2 md:py-0 min-w-0 flex items-center gap-4">
-            <div className={`transition-all duration-700 ${forgeState === 'FORGING' ? 'text-[#D4AF37] drop-shadow-[0_0_10px_#D4AF37]' : 'text-neutral-800'}`}>
-               <Rocket size={18} className={forgeState === 'FORGING' ? 'animate-bounce' : ''} />
-            </div>
+            {/* STEP 4: ROCKET ICON - Only in CONVENING */}
+            {forgeState === 'CONVENING' && (
+              <div className="text-[#D4AF37] drop-shadow-[0_0_8px_#D4AF37] animate-in slide-in-from-left-2 fade-in duration-500">
+                 <Rocket size={18} />
+              </div>
+            )}
             <input
               type="text"
               value={prompt}
@@ -129,7 +132,6 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, forgeState, tier, cooldo
             />
           </div>
           
-          {/* Right Button: Forge Trigger (THE ONLY TRIGGER) */}
           <button
             type="submit"
             disabled={isInputLocked || !prompt || !canGenerate}
@@ -142,7 +144,7 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, forgeState, tier, cooldo
             {forgeState === 'FORGING' ? (
               <span className="flex items-center gap-3">
                 <div className="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                MANIFESTING
+                FORGING...
               </span>
             ) : forgeState === 'SEALED' ? (
               <span className="flex items-center gap-2">

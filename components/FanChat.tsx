@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, RefreshCw, Loader2, Sparkles, MessageSquare, CheckCheck } from 'lucide-react';
 import { generateCharacterProfile, getCharacterResponse, CharacterProfile, ChatMessage } from '../lib/chat-engine';
@@ -41,8 +42,8 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
         text: `Hi. How are you doing? What’s on your mind?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
-    } catch (err) {
-      console.error("Failed to initialize character:", err);
+    } catch {
+      // Swallowed for Dignity
     } finally {
       setIsInitializing(false);
     }
@@ -78,8 +79,8 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, characterMsg]);
-    } catch (err) {
-      console.error("Chat response failed:", err);
+    } catch {
+      // Swallowed for Dignity
     } finally {
       setIsTyping(false);
     }

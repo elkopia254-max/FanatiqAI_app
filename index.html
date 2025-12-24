@@ -14,7 +14,6 @@
       --gold-light: #F9E29C;
       --charcoal: #0a0a0a;
       --granite: #141414;
-      /* Significantly faster transitions for instant feel */
       --transition-main: all 0.2s cubic-bezier(0.2, 0, 0, 1);
       --transition-fast: all 0.15s cubic-bezier(0.2, 0, 0, 1);
     }
@@ -29,7 +28,6 @@
     
     .font-cinzel { font-family: 'Cinzel', serif; }
     
-    /* Advanced Gold Shimmer */
     .gold-shimmer {
       background: linear-gradient(90deg, 
         rgba(212,175,55,0) 0%, 
@@ -53,7 +51,6 @@
       100% { transform: translateX(100%); }
     }
 
-    /* Sophisticated Reveal Animation */
     .reveal {
       opacity: 0;
       transform: translateY(20px);
@@ -64,7 +61,6 @@
       transform: translateY(0);
     }
 
-    /* Float Animation */
     .float {
       animation: float 8s ease-in-out infinite;
     }
@@ -95,6 +91,13 @@
       background-attachment: fixed;
     }
 
+    /* Forge Integrity Styles */
+    .forge-veil {
+      background: radial-gradient(circle at center, #0d0d0d 0%, #000 100%);
+      min-height: 100vh;
+      width: 100%;
+    }
+
     ::-webkit-scrollbar {
       width: 4px;
     }
@@ -113,7 +116,6 @@
       transform: translateY(-4px);
     }
 
-    /* Remove delay for category hover to feel instant */
     .category-item {
       transition-delay: 0s !important;
     }
