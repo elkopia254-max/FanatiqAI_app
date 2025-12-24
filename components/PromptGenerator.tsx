@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, ChevronDown, Lock, Timer, Layers, Circle, Square, Triangle, Activity } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronDown, Rocket, Timer, Layers, Circle, Square, Triangle, Activity } from 'lucide-react';
 import { SubArchetypeFlavor, SUB_ARCHETYPES } from '../lib/style-library';
 import { UserTier } from '../lib/subscription-store';
+import { ForgeState } from '../lib/forge-state';
 
 interface Props {
   onGenerate: (prompt: string, archetype: SubArchetypeFlavor) => void;
-  isGenerating: boolean;
+  forgeState: ForgeState;
   tier: UserTier;
   cooldown: number;
   canGenerate: boolean;
+  onInputFocus: () => void;
 }
 
 const ArchetypeIcon = ({ type, className }: { type: string, className?: string }) => {
@@ -21,37 +23,40 @@ const ArchetypeIcon = ({ type, className }: { type: string, className?: string }
   }
 };
 
-const PromptGenerator: React.FC<Props> = ({ onGenerate, isGenerating, tier, cooldown, canGenerate }) => {
+const PromptGenerator: React.FC<Props> = ({ onGenerate, forgeState, tier, cooldown, canGenerate, onInputFocus }) => {
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<SubArchetypeFlavor>('classical');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (prompt.trim() && !isGenerating && canGenerate) {
+    // Only ONE action triggers forging
+    if (prompt.trim() && (forgeState === 'CONVENING' || forgeState === 'DORMANT' || forgeState === 'COMPLETED' || forgeState === 'FAILED') && canGenerate) {
       onGenerate(prompt, selectedStyle);
     }
   };
 
   const archetypesList = Object.values(SUB_ARCHETYPES);
+  const isInputLocked = forgeState === 'SEALED' || forgeState === 'FORGING' || forgeState === 'SUSPENDED';
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 sm:px-0 relative z-[100]">
       <form onSubmit={handleSubmit} className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-[#D4AF37]/5 via-[#D4AF37]/20 to-[#D4AF37]/5 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition duration-1000" />
+        <div className={`absolute -inset-1 bg-gradient-to-r from-[#D4AF37]/5 via-[#D4AF37]/20 to-[#D4AF37]/5 rounded-[2.5rem] blur-xl opacity-0 transition duration-1000 ${forgeState === 'FORGING' ? 'opacity-100' : 'group-hover:opacity-100'}`} />
         
-        <div className="relative glass rounded-[2.5rem] p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 border-[#D4AF37]/20 shadow-2xl focus-within:border-[#D4AF37]/50 transition-all duration-500 z-10">
+        <div className={`relative glass rounded-[2.5rem] p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 border-[#D4AF37]/20 shadow-2xl transition-all duration-500 z-10 ${forgeState === 'FORGING' ? 'border-[#D4AF37]/60 ring-2 ring-[#D4AF37]/10' : ''}`}>
           
           {/* Left Button: Archetype Selector */}
           <div className="relative">
             <button 
               type="button"
+              disabled={isInputLocked}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`h-full px-6 py-4 flex items-center justify-between gap-4 text-[10px] font-black tracking-[0.2em] border-b md:border-b-0 md:border-r border-neutral-800/50 hover:bg-white/[0.04] transition-all min-w-full md:min-w-[220px] rounded-2xl md:rounded-r-none group/select ${isDropdownOpen ? 'bg-white/[0.04]' : 'text-neutral-400'}`}
+              className={`h-full px-6 py-4 flex items-center justify-between gap-4 text-[10px] font-black tracking-[0.2em] border-b md:border-b-0 md:border-r border-neutral-800/50 hover:bg-white/[0.04] transition-all min-w-full md:min-w-[220px] rounded-2xl md:rounded-r-none group/select ${isDropdownOpen ? 'bg-white/[0.04]' : 'text-neutral-400'} ${isInputLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className="flex flex-col items-start text-left">
                 <span className="text-[7px] text-[#D4AF37] mb-1.5 tracking-[0.4em] uppercase flex items-center gap-2 font-black">
-                  <ArchetypeIcon type={SUB_ARCHETYPES[selectedStyle].iconType} className="w-2.5 h-2.5" /> 
+                  <ArchetypeIcon type={SUB_ARCHETYPES[selectedStyle].iconType} className={`w-2.5 h-2.5 ${forgeState === 'FORGING' ? 'animate-pulse' : ''}`} /> 
                   SOUL ARTIFACT
                 </span>
                 <div className="flex items-center gap-2">
@@ -63,14 +68,13 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, isGenerating, tier, cool
               <ChevronDown size={14} className={`transition-transform duration-500 ${isDropdownOpen ? 'rotate-180 text-[#D4AF37]' : 'text-neutral-600'}`} />
             </button>
             
-            {isDropdownOpen && (
+            {isDropdownOpen && !isInputLocked && (
               <>
                 <div className="fixed inset-0 z-[110]" onClick={() => setIsDropdownOpen(false)} />
                 <div className="absolute top-[calc(100%+20px)] left-0 w-full md:w-[480px] glass rounded-[2.5rem] overflow-hidden border border-[#D4AF37]/40 z-[120] shadow-[0_40px_80px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300">
                   <div className="p-4 bg-neutral-950/98 backdrop-blur-3xl">
                     <div className="px-6 py-4 border-b border-neutral-900 mb-4 flex justify-between items-center">
                       <p className="text-[9px] font-black tracking-[0.5em] text-neutral-500 uppercase">SELECT NEURAL AESTHETIC</p>
-                      <span className="px-3 py-1 bg-[#D4AF37]/5 rounded-full border border-[#D4AF37]/20 text-[#D4AF37] text-[8px] font-black tracking-widest uppercase">4 VARIANTS AVAILABLE</span>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-3">
@@ -95,27 +99,13 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, isGenerating, tier, cool
                             }`}>
                               <ArchetypeIcon type={s.iconType} className="w-4 h-4" />
                             </div>
-                            
                             <span className="text-[11px] font-black tracking-[0.2em] uppercase mb-1">{s.label}</span>
                             <p className={`text-[8px] font-bold tracking-wide leading-tight uppercase opacity-60 ${isSelected ? 'text-black' : 'text-neutral-500'}`}>
                               {s.material}
                             </p>
-                            
-                            {isSelected && (
-                              <div className="mt-4 w-full h-0.5 bg-black/20 rounded-full overflow-hidden">
-                                <div className="h-full bg-black/40 w-full animate-[progress_2s_ease-in-out_infinite]" />
-                              </div>
-                            )}
                           </button>
                         );
                       })}
-                    </div>
-
-                    <div className="mt-6 px-6 py-4 bg-neutral-900/40 rounded-2xl border border-neutral-900 flex items-center justify-between">
-                      <span className="text-[8px] text-neutral-600 font-bold tracking-widest uppercase">SYMMETRY LOCK</span>
-                      <div className="w-8 h-4 bg-[#D4AF37]/20 rounded-full border border-[#D4AF37]/40 relative flex items-center px-0.5">
-                        <div className="w-2.5 h-2.5 bg-[#D4AF37] rounded-full shadow-[0_0_8px_#D4AF37]" />
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -123,31 +113,40 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, isGenerating, tier, cool
             )}
           </div>
 
-          {/* Central Input Area */}
-          <div className="flex-1 px-4 sm:px-8 relative py-2 md:py-0 min-w-0">
+          {/* Central Input Area with Passive Rocket Indicator */}
+          <div className="flex-1 px-4 sm:px-8 relative py-2 md:py-0 min-w-0 flex items-center gap-4">
+            <div className={`transition-all duration-700 ${forgeState === 'FORGING' ? 'text-[#D4AF37] drop-shadow-[0_0_10px_#D4AF37]' : 'text-neutral-800'}`}>
+               <Rocket size={18} className={forgeState === 'FORGING' ? 'animate-bounce' : ''} />
+            </div>
             <input
               type="text"
               value={prompt}
+              disabled={isInputLocked}
               onChange={(e) => setPrompt(e.target.value)}
+              onFocus={onInputFocus}
               placeholder="Who’s your favorite star or club?"
-              className="w-full h-full bg-transparent text-white placeholder-neutral-700 focus:outline-none text-base md:text-lg font-light py-4 transition-all focus:placeholder-neutral-500 truncate"
+              className={`w-full h-full bg-transparent text-white placeholder-neutral-700 focus:outline-none text-base md:text-lg font-light py-4 transition-all focus:placeholder-neutral-500 truncate ${isInputLocked ? 'opacity-30' : ''}`}
             />
           </div>
           
-          {/* Right Button: Forge Artifact */}
+          {/* Right Button: Forge Trigger (THE ONLY TRIGGER) */}
           <button
             type="submit"
-            disabled={isGenerating || !prompt || !canGenerate}
+            disabled={isInputLocked || !prompt || !canGenerate}
             className={`px-8 md:px-10 py-4 md:py-5 rounded-2xl font-black text-[10px] tracking-[0.3em] flex items-center justify-center gap-3 transition-all duration-500 relative overflow-hidden group/btn flex-shrink-0 ${
-              isGenerating || !prompt || !canGenerate
+              isInputLocked || !prompt || !canGenerate
                 ? 'bg-neutral-900 text-neutral-700 cursor-not-allowed border border-neutral-800'
                 : 'bg-gradient-to-br from-[#D4AF37] via-[#F9E29C] to-[#8B7326] text-black shadow-xl hover:shadow-[#D4AF37]/30 hover:scale-[1.02] active:scale-95'
             }`}
           >
-            {isGenerating ? (
+            {forgeState === 'FORGING' ? (
               <span className="flex items-center gap-3">
                 <div className="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                 MANIFESTING
+              </span>
+            ) : forgeState === 'SEALED' ? (
+              <span className="flex items-center gap-2">
+                SEALING CORE
               </span>
             ) : cooldown > 0 ? (
               <span className="flex items-center gap-2">
@@ -156,8 +155,8 @@ const PromptGenerator: React.FC<Props> = ({ onGenerate, isGenerating, tier, cool
               </span>
             ) : (
               <>
-                <Sparkles size={14} className="transition-transform duration-500 group-hover/btn:rotate-12 group-hover/btn:scale-110" />
-                FORGE ARTIFACT
+                <Sparkles size={14} className={`transition-transform duration-500 ${forgeState === 'CONVENING' ? 'scale-110 text-black' : 'opacity-40 group-hover/btn:rotate-12 group-hover/btn:scale-110'}`} />
+                BEGIN FORMATION
                 <ArrowRight size={14} className="transition-transform duration-500 group-hover/btn:translate-x-1" />
               </>
             )}

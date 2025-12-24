@@ -15,17 +15,16 @@ import { enhancePrompt, validatePrompt, SubArchetypeFlavor } from './lib/prompt-
 import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
+import { ForgeState, FORGE_MESSAGES } from './lib/forge-state';
 
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<ViewType>('home');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isTimelineLoading, setIsTimelineLoading] = useState(false);
+  const [forgeState, setForgeState] = useState<ForgeState>('DORMANT');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [timelineArtifact, setTimelineArtifact] = useState<TimelineArtifact | null>(null);
   const [chatConcept, setChatConcept] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
   
-  // Auth state
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   
@@ -43,7 +42,7 @@ const App: React.FC = () => {
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeView]);
+  }, [activeView, forgeState]);
 
   const handleGenerate = async (starInput: string, archetype: SubArchetypeFlavor) => {
     if (!canGenerate) return;
@@ -53,8 +52,14 @@ const App: React.FC = () => {
       return;
     }
 
-    setIsGenerating(true);
-    setIsTimelineLoading(true);
+    // PHASE: SEALED
+    setForgeState('SEALED');
+    
+    // Brief ceremony delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // PHASE: FORGING
+    setForgeState('FORGING');
     setGeneratedImages([]);
     setTimelineArtifact(null);
     setChatConcept(starInput);
@@ -66,6 +71,7 @@ const App: React.FC = () => {
       const imageCount = subState.tier === 'pro' ? 4 : 1;
       const results: string[] = [];
 
+      // Intercept and handle all potential failure points
       const imagePromise = (async () => {
         const generationTasks = Array(imageCount).fill(null).map(() => 
           ai.models.generateContent({
@@ -85,37 +91,155 @@ const App: React.FC = () => {
           }
         });
         
-        if (results.length === 0) {
-          results.push(`https://picsum.photos/seed/${Date.now()}/800/1200`);
-        }
-        setGeneratedImages(results);
+        if (results.length === 0) throw new Error("quota exceeded"); // Simulated for safety or catch real empty
+        return results;
       })();
 
       const timelinePromise = (async () => {
-        try {
-          const artifact = await generateTimeline(starInput);
-          setTimelineArtifact(artifact);
-        } catch (err) {
-          console.error("Timeline generation failed:", err);
-        } finally {
-          setIsTimelineLoading(false);
-        }
+        return await generateTimeline(starInput);
       })();
 
-      await Promise.all([imagePromise, timelinePromise]);
+      // ALL or NOTHING rendering
+      const [images, timeline] = await Promise.all([imagePromise, timelinePromise]);
+      
+      setGeneratedImages(images);
+      setTimelineArtifact(timeline);
+      
+      // PHASE: COMPLETED (Only now components mount)
+      setForgeState('COMPLETED');
       recordGeneration();
-      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-      console.error("AI Generation failed:", error);
-    } finally {
-      setIsGenerating(false);
-      setIsTimelineLoading(false);
+      
+      setTimeout(() => {
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+
+    } catch (error: any) {
+      // FORGE INTEGRITY: Convert all technical noise into dignified states
+      console.error("Forge Error Catch:", error);
+      const errorStr = (error.message || "").toLowerCase();
+      
+      if (
+        errorStr.includes("quota") || 
+        errorStr.includes("limit") || 
+        errorStr.includes("overload") || 
+        errorStr.includes("timeout") ||
+        errorStr.includes("socket") ||
+        errorStr.includes("partial")
+      ) {
+        setForgeState('SUSPENDED');
+      } else {
+        setForgeState('FAILED');
+      }
     }
   };
 
   const handleAuthClick = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
+  };
+
+  const renderHomeContent = () => {
+    return (
+      <div className="space-y-12">
+        {/* DORMANT / CONVENING / SEALED / FORGING States always show Hero and Input */}
+        <section className="reveal active relative z-10">
+          <Hero 
+            selectedCategoryId={selectedCategoryId} 
+            onCategorySelect={(id) => {
+              setSelectedCategoryId(id);
+              if (forgeState === 'DORMANT') setForgeState('CONVENING');
+            }} 
+          />
+        </section>
+        
+        <section id="generate" className="reveal relative z-[100] space-y-6">
+          <PromptGenerator 
+            onGenerate={handleGenerate} 
+            forgeState={forgeState}
+            tier={subState.tier} 
+            cooldown={subState.cooldownRemaining}
+            canGenerate={canGenerate}
+            onInputFocus={() => {
+              if (forgeState === 'DORMANT' || forgeState === 'COMPLETED' || forgeState === 'FAILED') {
+                setForgeState('CONVENING');
+              }
+            }}
+          />
+          <UsageTracker 
+            state={subState} 
+            forgeState={forgeState}
+            onUpgradeClick={() => {
+              setActiveView('pricing');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} 
+          />
+        </section>
+
+        {/* SUSPENDED STATE: Dignified Rest Screen */}
+        {forgeState === 'SUSPENDED' && (
+          <section className="reveal active py-24 flex flex-col items-center justify-center text-center space-y-8 glass rounded-[4rem] border-[#D4AF37]/10 mx-auto max-w-4xl animate-in fade-in duration-700">
+            <div className="w-20 h-20 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-600">
+              <div className="w-3 h-3 rounded-full bg-neutral-700 animate-pulse" />
+            </div>
+            <p className="font-cinzel text-xl md:text-2xl tracking-[0.4em] uppercase text-neutral-400 px-10 leading-relaxed">
+              {FORGE_MESSAGES.SUSPENDED}
+            </p>
+            <button 
+              onClick={() => setForgeState('DORMANT')}
+              className="text-[10px] font-black tracking-[0.4em] text-[#D4AF37] uppercase hover:underline opacity-60 hover:opacity-100 transition-opacity"
+            >
+              Quiet Reset
+            </button>
+          </section>
+        )}
+
+        {/* FAILED STATE: Quiet Failure Screen */}
+        {forgeState === 'FAILED' && (
+          <section className="reveal active py-24 flex flex-col items-center justify-center text-center space-y-8 glass rounded-[4rem] border-[#D4AF37]/10 mx-auto max-w-4xl animate-in fade-in duration-700">
+            <div className="w-20 h-20 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-700">
+              <div className="w-1.5 h-1.5 rounded-full bg-neutral-800" />
+            </div>
+            <p className="font-cinzel text-xl md:text-2xl tracking-[0.4em] uppercase text-neutral-500 px-10 leading-relaxed">
+              {FORGE_MESSAGES.FAILED}
+            </p>
+            <button 
+              onClick={() => setForgeState('DORMANT')}
+              className="text-[10px] font-black tracking-[0.4em] text-[#D4AF37] uppercase hover:underline opacity-60 hover:opacity-100 transition-opacity"
+            >
+              Reopen Forge
+            </button>
+          </section>
+        )}
+
+        {/* COMPLETED STATE: The only state allowed to render these components */}
+        {forgeState === 'COMPLETED' && (
+          <>
+            <section id="command-center" className="reveal active py-12 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                <div className="lg:col-span-8">
+                  <ResultsSection 
+                    isLoading={false} 
+                    images={generatedImages} 
+                    tier={subState.tier} 
+                    gridColsOverride="grid-cols-1 md:grid-cols-2" 
+                  />
+                </div>
+                <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px] z-10">
+                  <FanChat 
+                    initialConcept={chatConcept} 
+                    isSidebarMode={true} 
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section id="timeline-archive" className="reveal active py-12 relative z-10">
+              <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
+            </section>
+          </>
+        )}
+      </div>
+    );
   };
 
   const renderContent = () => {
@@ -133,9 +257,14 @@ const App: React.FC = () => {
           </section>
         );
       case 'fanchat':
+        // Individual chat view should also respect the COMPLETED rule or show a placeholder
         return (
           <section id="chat" className="reveal active py-20 relative z-10">
-            <FanChat />
+            {forgeState === 'COMPLETED' ? <FanChat /> : (
+              <div className="glass rounded-[4rem] p-24 text-center border-neutral-900">
+                <p className="font-cinzel text-neutral-700 tracking-[0.5em] uppercase">Awaiting Formation Completion</p>
+              </div>
+            )}
           </section>
         );
       case 'pricing':
@@ -146,56 +275,7 @@ const App: React.FC = () => {
         );
       case 'home':
       default:
-        return (
-          <div className="space-y-12">
-            <section className="reveal active relative z-10">
-              <Hero 
-                selectedCategoryId={selectedCategoryId} 
-                onCategorySelect={setSelectedCategoryId} 
-              />
-            </section>
-            
-            <section id="generate" className="reveal relative z-[100] space-y-6">
-              <PromptGenerator 
-                onGenerate={handleGenerate} 
-                isGenerating={isGenerating} 
-                tier={subState.tier} 
-                cooldown={subState.cooldownRemaining}
-                canGenerate={canGenerate}
-              />
-              <UsageTracker 
-                state={subState} 
-                onUpgradeClick={() => {
-                  setActiveView('pricing');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }} 
-              />
-            </section>
-
-            <section id="command-center" className="reveal active py-12 relative z-10">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-                <div className="lg:col-span-8">
-                  <ResultsSection 
-                    isLoading={isGenerating} 
-                    images={generatedImages} 
-                    tier={subState.tier} 
-                    gridColsOverride="grid-cols-1 md:grid-cols-2" 
-                  />
-                </div>
-                <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px] z-10">
-                  <FanChat 
-                    initialConcept={chatConcept} 
-                    isSidebarMode={true} 
-                  />
-                </div>
-              </div>
-            </section>
-
-            <section id="timeline-archive" className="reveal py-12 relative z-10">
-              <TimelineGenerator artifact={timelineArtifact} isLoading={isTimelineLoading} />
-            </section>
-          </div>
-        );
+        return renderHomeContent();
     }
   };
 
