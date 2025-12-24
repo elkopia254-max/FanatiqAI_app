@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Header, { ViewType } from './components/Header';
 import Hero from './components/Hero';
@@ -276,7 +275,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (activeView) {
       case 'trending':
-        return <section className="reveal active py-20"><Gallery title="New G.O.A.T" type="trending" /></section>;
+        return <section className="reveal active py-20"><Gallery title="G.O.A.T" type="trending" /></section>;
       case 'community':
         return <section className="reveal active py-20"><Gallery title="Fan Book" type="community" /></section>;
       case 'fanchat':

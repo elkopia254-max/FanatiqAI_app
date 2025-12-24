@@ -65,6 +65,7 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
 
   const navItems = [
     { label: 'CREATE TRIBUTE', value: 'home' as ViewType },
+    { label: 'G.O.A.T', value: 'trending' as ViewType },
     { label: 'Fan Book', value: 'community' as ViewType },
     { label: 'Fan Chat', value: 'fanchat' as ViewType },
   ];

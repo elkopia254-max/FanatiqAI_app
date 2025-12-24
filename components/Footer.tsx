@@ -42,9 +42,9 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
 
   const coreNav = [
     { label: 'Create Tribute', value: 'home' as ViewType },
+    { label: 'G.O.A.T', value: 'trending' as ViewType },
     { label: 'Fan Book', value: 'community' as ViewType },
     { label: 'Fan Chat', value: 'fanchat' as ViewType },
-    { label: 'Trending', value: 'trending' as ViewType },
     { label: 'Pricing', value: 'pricing' as ViewType },
   ];
 
@@ -57,7 +57,7 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
           <div className="lg:col-span-4 space-y-8">
             <div className="space-y-4">
               <h2 className="text-[#D4AF37] font-cinzel font-bold text-2xl tracking-[0.4em] uppercase drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]">
-                FANATIQAI
+                FANATIQ<span className="text-white">AI</span>
               </h2>
               <p className="text-[11px] text-neutral-500 font-black tracking-[0.3em] uppercase leading-relaxed max-w-sm">
                 The definitive platform for the modern fan. Create, honor, and preserve the digital legacies of the stars you love through advanced neural manifestation.
