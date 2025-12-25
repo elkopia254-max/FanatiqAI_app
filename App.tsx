@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Header, { ViewType } from './components/Header';
 import Hero from './components/Hero';
@@ -17,51 +16,10 @@ import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
 import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
-import { Shield, Globe, Star, Users, ArrowLeft, Sparkles, Crown, Zap, ShieldAlert, MessageSquare, Clock, X } from 'lucide-react';
+import { Shield, Globe, Star, Users, ArrowLeft, Sparkles, Crown, Zap, ShieldAlert, MessageCircle, Clock, X } from 'lucide-react';
 
 /**
- * STATIC PAGE COMPONENT
- */
-const StaticPage: React.FC<{ 
-  title: string; 
-  subtitle: string; 
-  icon: React.ReactNode; 
-  onBack: () => void;
-  children?: React.ReactNode;
-}> = ({ title, subtitle, icon, onBack, children }) => (
-  <div className="py-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
-    <button 
-      onClick={onBack}
-      className="mb-12 flex items-center gap-4 text-[9px] font-black tracking-[0.4em] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase transition-all"
-    >
-      <ArrowLeft size={14} /> Back to core
-    </button>
-    
-    <div className="flex flex-col items-center text-center mb-24">
-      <div className="w-20 h-20 rounded-3xl border border-[#D4AF37]/20 bg-neutral-950 flex items-center justify-center text-[#D4AF37] mb-8 shadow-2xl">
-        {icon}
-      </div>
-      <h1 className="text-4xl md:text-6xl font-cinzel font-bold text-white tracking-[0.2em] uppercase mb-6 drop-shadow-2xl">
-        {title}
-      </h1>
-      <p className="text-[11px] font-black tracking-[0.6em] text-[#D4AF37] uppercase opacity-80 max-w-xl mx-auto leading-relaxed">
-        {subtitle}
-      </p>
-      <div className="mt-12 h-[1px] w-32 bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent" />
-    </div>
-
-    <div className="max-w-4xl mx-auto glass p-12 md:p-20 rounded-[4rem] border-[#D4AF37]/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
-      {children || (
-        <div className="space-y-12 text-neutral-400 text-sm leading-relaxed tracking-wide font-light">
-          <p className="italic">“In the digital multiverse, legacy is the only true currency. FanatiqAI stands at the intersection of neural excellence and fan devotion, crafting eternal sigils for the icons that define our era.”</p>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-/**
- * FORGE STATUS NOTIFICATION (Informational Only)
+ * FORGE STATUS NOTIFICATION (Terminal Signal UI)
  */
 const ForgeStatusNotification: React.FC<{ 
   onDismiss: () => void; 
@@ -75,7 +33,7 @@ const ForgeStatusNotification: React.FC<{
       </div>
       <div className="flex-1 space-y-1">
         <h4 className="text-[10px] font-black tracking-[0.2em] text-[#D4AF37] uppercase font-cinzel">
-          CORE ALERT
+          {isFailed ? 'TERMINAL FAULT' : 'CORE UPDATE'}
         </h4>
         <p className="text-[10px] text-neutral-400 font-bold tracking-widest leading-relaxed uppercase">
           {message}
@@ -93,18 +51,17 @@ const App: React.FC = () => {
     return (localStorage.getItem('fanatiq_active_view') as ViewType) || 'home';
   });
   
-  // UI PERSISTENCE: Inputs must remain rendered and stored
+  // UI PERSISTENCE
   const [persistedPrompt, setPersistedPrompt] = useState(() => localStorage.getItem('fanatiq_last_prompt') || '');
   const [persistedArchetype, setPersistedArchetype] = useState<SubArchetypeFlavor>(() => (localStorage.getItem('fanatiq_last_archetype') as SubArchetypeFlavor) || 'classical');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(() => Number(localStorage.getItem('fanatiq_last_category')) || 1);
 
-  // ASYNC STATE
+  // DEFINITIVE ASYNC STATE (Terminal: DONE or FAIL)
   const [forgeState, setForgeState] = useState<ForgeState>('DORMANT');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [timelineArtifact, setTimelineArtifact] = useState<TimelineArtifact | null>(null);
   const [chatConcept, setChatConcept] = useState<string | null>(null);
-  const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [isFailsafeActive, setIsFailsafeActive] = useState(false);
   
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -112,17 +69,16 @@ const App: React.FC = () => {
   
   const { state: subState, recordGeneration, canGenerate, upgradeToPro, downgradeToFree } = useSubscription();
 
-  const forgeStateRef = useRef<ForgeState>(forgeState);
   const watchdogRef = useRef<number | null>(null);
+  const jobResolvedRef = useRef<boolean>(false);
 
   // Persistence Sync
   useEffect(() => { 
-    forgeStateRef.current = forgeState;
     localStorage.setItem('fanatiq_active_view', activeView);
     localStorage.setItem('fanatiq_last_prompt', persistedPrompt);
     localStorage.setItem('fanatiq_last_archetype', persistedArchetype);
     localStorage.setItem('fanatiq_last_category', selectedCategoryId.toString());
-  }, [forgeState, activeView, persistedPrompt, persistedArchetype, selectedCategoryId]);
+  }, [activeView, persistedPrompt, persistedArchetype, selectedCategoryId]);
 
   const clearWatchdog = () => {
     if (watchdogRef.current) {
@@ -132,25 +88,54 @@ const App: React.FC = () => {
   };
 
   /**
-   * 20s HARD UI TIMEOUT
+   * DEFINITIVE RESOLUTION ENGINE (Rule 2 & 3)
+   * Ensures exactly one terminal signal: DONE (COMPLETED) or FAIL (FAILED).
+   * Terminal signal instantly clears loading "fog" overlay.
+   */
+  const resolveJob = (finalState: 'COMPLETED' | 'FAILED', message: string | null = null) => {
+    // Rule 2: Single Resolution check
+    if (jobResolvedRef.current) {
+      logForgeEvent('multiple_resolution', 'A secondary resolution signal was ignored to maintain terminal integrity.');
+      return;
+    }
+    jobResolvedRef.current = true;
+    clearWatchdog();
+    
+    // Rule 3: Frontend Release - Terminal signal clears fog by updating state
+    setForgeState(finalState);
+    setStatusMessage(message);
+    localStorage.setItem('fanatiq_job_active', 'false');
+    
+    // Rule 1 & 5: Restore interactive capability instantly
+    if (finalState === 'FAILED') {
+      // Revert to DORMANT almost instantly while keeping the error message visible
+      setTimeout(() => setForgeState('DORMANT'), 100); 
+    }
+  };
+
+  /**
+   * HARD 20s WATCHDOG (Rule 1)
    */
   const startWatchdog = () => {
     clearWatchdog();
     watchdogRef.current = window.setTimeout(() => {
-      if (forgeStateRef.current === 'FORGING' || forgeStateRef.current === 'QUEUED' || forgeStateRef.current === 'SEALED') {
-        logForgeEvent('timeout', 'Job exceeded 20s hard limit. Restoration triggered.');
-        setStatusMessage("Forge ready.");
-        setForgeState('DORMANT'); 
-        localStorage.setItem('fanatiq_job_active', 'false');
+      if (!jobResolvedRef.current) {
+        logForgeEvent('timeout', 'Strict 20s terminal threshold reached. Forcing FAIL.');
+        resolveJob('FAILED', FORGE_MESSAGES.TIMEOUT); 
       }
-    }, 20000);
+    }, 20000); // 20-second hard limit
   };
 
+  /**
+   * CORE ASYNC FORGE (Rule 4, 5)
+   */
   const safeGenerate = async (starInput: string, archetype: SubArchetypeFlavor, useFailsafe: boolean = false): Promise<{ images: string[], timeline: TimelineArtifact } | null> => {
     const selectedCategory = categories.find(c => c.id === selectedCategoryId) || categories[0];
     const enhancedPrompt = enhancePrompt(starInput, archetype, selectedCategory.name);
+    
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Rule 5: Fallback mode switches to lightweight model if primary fails
       const imageCount = useFailsafe ? 1 : (subState.tier === 'pro' ? 4 : 1);
       const modelName = useFailsafe ? 'gemini-flash-lite-latest' : 'gemini-2.5-flash-image';
 
@@ -176,7 +161,6 @@ const App: React.FC = () => {
           });
           return results.length > 0 ? results : null;
         } catch (err: any) { 
-          if (err.message?.includes('429')) setIsFailsafeActive(true);
           return null; 
         }
       })();
@@ -186,12 +170,22 @@ const App: React.FC = () => {
       })();
 
       const [images, timeline] = await Promise.all([imagePromise, timelinePromise]);
-      if (!images || !timeline) return null;
+      
+      // Rule 4: No silent pending or partial responses.
+      if (!images || !timeline) {
+        logForgeEvent('null_response', 'Incomplete artifact structure detected.');
+        return null;
+      }
       return { images, timeline };
-    } catch { return null; }
+    } catch (e) {
+      logForgeEvent('api_failure', 'Forge execution thread interrupted.');
+      return null;
+    }
   };
 
   const beginFormation = async (starInput: string, archetype: SubArchetypeFlavor) => {
+    // Initiation Phase
+    jobResolvedRef.current = false;
     clearWatchdog();
     localStorage.setItem('fanatiq_job_active', 'true');
     setGeneratedImages([]);
@@ -199,42 +193,53 @@ const App: React.FC = () => {
     setIsFailsafeActive(false);
     setStatusMessage(null);
 
-    // Rule 1, 2, 5 & 6: We use semantic validation but NEVER block formations for names.
     const validation = validatePrompt(starInput);
     if (!validation.isValid) {
-      logForgeEvent('api_failure', "Integrity Fault");
-      setForgeState('FAILED');
-      setTimeout(() => setForgeState('DORMANT'), 800);
+      logForgeEvent('doctrine_violation', 'Formative request denied by security guard.');
+      resolveJob('FAILED', validation.reason || "Integrity Violation");
       return;
     }
 
-    // Rule 5: Show specialized message for real-world identity detection
     if (validation.isRealPerson) {
       setStatusMessage("Symbolic avatar created in respect of real-world identity.");
     }
 
-    setForgeState("SEALED");
+    // Enter Terminal Track
+    setForgeState("FORGING");
     setChatConcept(starInput);
     startWatchdog();
 
-    // Async Job Isolation
-    const result = await safeGenerate(starInput, archetype);
-    
-    clearWatchdog();
-    localStorage.setItem('fanatiq_job_active', 'false');
+    try {
+      // Step 1: Primary High-Fidelity Attempt
+      let result = await safeGenerate(starInput, archetype);
+      
+      // Step 2: Fallback (Rule 5)
+      if (!result && !jobResolvedRef.current) {
+        logForgeEvent('quota', 'Initiating lightweight symbolic fallback due to primary failure.');
+        setIsFailsafeActive(true);
+        result = await safeGenerate(starInput, archetype, true);
+      }
 
-    if (result) {
-      setGeneratedImages(result.images);
-      setTimelineArtifact(result.timeline);
-      setForgeState("COMPLETED");
-      recordGeneration();
-      setTimeout(() => {
-        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    } else {
-      setForgeState("DORMANT");
-      // Keep existing user status if real person was detected, otherwise show ready
-      if (!validation.isRealPerson) setStatusMessage("Forge ready.");
+      // Final Resolution (Rule 2 & 4)
+      if (!jobResolvedRef.current) {
+        if (result) {
+          setGeneratedImages(result.images);
+          setTimelineArtifact(result.timeline);
+          recordGeneration();
+          resolveJob('COMPLETED'); // Terminal DONE
+          setTimeout(() => {
+            document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        } else {
+          // Rule 4: Explicit FAIL if result is missing
+          resolveJob('FAILED', FORGE_MESSAGES.FAILED); 
+        }
+      }
+    } catch (e) {
+      if (!jobResolvedRef.current) {
+        logForgeEvent('api_failure', 'Uncaught exception in forge pipeline.');
+        resolveJob('FAILED', FORGE_MESSAGES.FAILED);
+      }
     }
   };
 
@@ -243,78 +248,77 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const renderHomeContent = () => {
-    return (
-      <div className="space-y-12 animate-in fade-in duration-500 relative">
-        {statusMessage && (
-          <ForgeStatusNotification 
-            onDismiss={() => setStatusMessage(null)} 
-            message={statusMessage}
-          />
-        )}
+  const renderHomeContent = () => (
+    <div className="space-y-12 animate-in fade-in duration-500 relative">
+      {statusMessage && (
+        <ForgeStatusNotification 
+          onDismiss={() => setStatusMessage(null)} 
+          message={statusMessage}
+          isFailed={forgeState === 'FAILED'}
+        />
+      )}
 
-        <section className="reveal active relative z-10">
-          <Hero 
-            selectedCategoryId={selectedCategoryId} 
-            onCategorySelect={(id) => {
-              setSelectedCategoryId(id);
-              if (forgeState === 'DORMANT') setForgeState('CONVENING');
-            }} 
-          />
-        </section>
-        
-        <section id="generate" className="reveal active relative z-[100] space-y-6">
-          <PromptGenerator 
-            onGenerate={beginFormation} 
-            forgeState={forgeState}
-            tier={subState.tier} 
-            cooldown={subState.cooldownRemaining}
-            canGenerate={canGenerate}
-            initialPrompt={persistedPrompt}
-            initialArchetype={persistedArchetype}
-            onPromptChange={setPersistedPrompt}
-            onArchetypeChange={setPersistedArchetype}
-            onInputFocus={() => {
-              if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') {
-                setForgeState('CONVENING');
-              }
-            }}
-          />
+      <section className="reveal active relative z-10">
+        <Hero 
+          selectedCategoryId={selectedCategoryId} 
+          onCategorySelect={(id) => {
+            setSelectedCategoryId(id);
+            if (forgeState === 'DORMANT') setForgeState('CONVENING');
+          }} 
+        />
+      </section>
+      
+      <section id="generate" className="reveal active relative z-[100] space-y-6">
+        <PromptGenerator 
+          onGenerate={beginFormation} 
+          forgeState={forgeState}
+          tier={subState.tier} 
+          cooldown={subState.cooldownRemaining}
+          canGenerate={canGenerate}
+          initialPrompt={persistedPrompt}
+          initialArchetype={persistedArchetype}
+          onPromptChange={setPersistedPrompt}
+          onArchetypeChange={setPersistedArchetype}
+          onInputFocus={() => {
+            if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') {
+              setForgeState('CONVENING');
+            }
+          }}
+        />
 
-          {isFailsafeActive && (
-            <div className="max-w-md mx-auto py-2 px-6 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center gap-3 justify-center">
-              <Zap size={12} className="text-[#D4AF37] animate-pulse" />
-              <span className="text-[8px] font-black tracking-[0.2em] text-[#D4AF37] uppercase">High Performance Optimized</span>
-            </div>
-          )}
-
-          <UsageTracker 
-            state={subState} 
-            forgeState={forgeState}
-            onUpgradeClick={() => handleViewChange('pricing')} 
-          />
-        </section>
-
-        {forgeState === 'COMPLETED' && (
-          <div className="space-y-20 animate-in fade-in slide-in-from-bottom-10 duration-1000">
-            <section id="command-center" className="reveal active py-12 relative z-10">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-                <div className="lg:col-span-8">
-                  <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" />
-                </div>
-                <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px] z-10">
-                  <FanChat initialConcept={chatConcept} isSidebarMode={true} />
-                </div>
-              </div>
-            </section>
-            <section id="timeline-archive" className="reveal active py-12 relative z-10">
-              <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
-            </section>
+        {isFailsafeActive && (
+          <div className="max-w-md mx-auto py-2 px-6 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center gap-3 justify-center">
+            <Zap size={12} className="text-[#D4AF37] animate-pulse" />
+            <span className="text-[8px] font-black tracking-[0.4em] text-[#D4AF37] uppercase">Symbolic Lightweight Mode</span>
           </div>
         )}
-      </div>
-    );
-  };
+
+        <UsageTracker 
+          state={subState} 
+          forgeState={forgeState}
+          onUpgradeClick={() => handleViewChange('pricing')} 
+        />
+      </section>
+
+      {forgeState === 'COMPLETED' && (
+        <div className="space-y-20 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+          <section id="command-center" className="reveal active py-12 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              <div className="lg:col-span-8">
+                <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" />
+              </div>
+              <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px] z-10">
+                <FanChat initialConcept={chatConcept} isSidebarMode={true} />
+              </div>
+            </div>
+          </section>
+          <section id="timeline-archive" className="reveal active py-12 relative z-10">
+            <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
+          </section>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen granite-texture bg-[#0d0d0d] overflow-x-hidden selection:bg-[#D4AF37] selection:text-black">
@@ -326,9 +330,6 @@ const App: React.FC = () => {
             {activeView === 'community' && <Gallery title="Fan Book" type="community" />}
             {activeView === 'fanchat' && <FanChat initialConcept={chatConcept} />}
             {activeView === 'pricing' && <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? upgradeToPro : downgradeToFree} />}
-            {activeView === 'about' && <StaticPage title="The Origin" subtitle="REDEFINING THE FAN EXPERIENCE" icon={<Users />} onBack={() => handleViewChange('home')} />}
-            {activeView === 'law' && <StaticPage title="Multiverse Law" subtitle="THE SACRED DOCTRINE" icon={<Shield />} onBack={() => handleViewChange('home')} />}
-            {activeView === 'goat' && <StaticPage title="What is G.O.A.T?" subtitle="THE HIGHEST RESONANCE" icon={<Star />} onBack={() => handleViewChange('home')} />}
           </div>
         )}
       </main>
