@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, ChevronDown, Rocket, Timer, Layers, Circle, Square, Triangle, Activity, RefreshCw } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronDown, Timer, Layers, Circle, Square, Triangle, Activity, RefreshCw } from 'lucide-react';
 import { SubArchetypeFlavor, SUB_ARCHETYPES } from '../lib/style-library';
 import { UserTier } from '../lib/subscription-store';
 import { ForgeState } from '../lib/forge-state';
@@ -63,7 +64,6 @@ const PromptGenerator: React.FC<Props> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Rule 1: Always interactive. Logic handles cooling/validation.
     if (prompt.trim()) {
       onGenerate(prompt, selectedStyle);
     }
@@ -77,9 +77,8 @@ const PromptGenerator: React.FC<Props> = ({
       <form onSubmit={handleSubmit} className="relative group">
         <div className={`absolute -inset-1 bg-gradient-to-r from-[#D4AF37]/5 via-[#D4AF37]/20 to-[#D4AF37]/5 rounded-[2.5rem] blur-xl opacity-0 transition duration-1000 ${isProcessActive ? 'opacity-100' : 'group-hover:opacity-100'}`} />
         
-        <div className={`relative glass rounded-[2.5rem] p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 border-[#D4AF37]/20 shadow-2xl transition-all duration-500 z-10 ${isProcessActive ? 'border-[#D4AF37]/60 ring-2 ring-[#D4AF37]/10' : ''}`}>
+        <div className={`relative glass rounded-[2.5rem] p-2 flex flex-col md:flex-row items-stretch md:items-center gap-2 border-[#D4AF37]/20 shadow-2xl transition-all duration-500 z-10 ${isProcessActive ? 'border-[#D4AF37]/60 ring-2 ring-[#D4AF37]/10 neural-pulse-active' : ''}`}>
           
-          {/* Sub-Category Selector - Always Interactive */}
           <div className="relative" id="sub-category-selector-container">
             <button 
               type="button"
@@ -123,10 +122,9 @@ const PromptGenerator: React.FC<Props> = ({
             )}
           </div>
 
-          {/* User Placeholder Input - Always Rendered */}
           <div className="flex-1 px-4 sm:px-8 relative py-3 md:py-0 min-w-0 flex items-center gap-5">
             <input
-              id="user-placeholder"
+              id="starNameInput"
               type="text"
               value={prompt}
               onChange={(e) => handlePromptUpdate(e.target.value)}
@@ -136,7 +134,6 @@ const PromptGenerator: React.FC<Props> = ({
             />
           </div>
           
-          {/* Forge Button (Rocket) - Always Interactive */}
           <button
             id="forge-button"
             type="submit"

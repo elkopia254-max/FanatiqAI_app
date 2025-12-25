@@ -19,18 +19,19 @@ export interface ChatMessage {
 
 /**
  * Generates a persona for an "ICON CONVERSATION MODE" manifestation.
+ * This manifestation is a fictional tribute persona.
  */
 export const generateCharacterProfile = async (conceptName: string): Promise<CharacterProfile> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Create a realistic conversational persona for a manifestation of the global icon "${conceptName}".
+  const prompt = `Create a realistic conversational persona for a manifestation of the fictional tribute character inspired by "${conceptName}".
   
   CONSTRAINTS:
-  - Persona is a human, natural, and socially realistic manifestation of a Global Icon.
-  - Speak as if you met the user casually in real life (street, event, café).
+  - Persona is a human-like, natural manifestation of a fan-imagined Tribute Character.
+  - Speak as if you are the fictional essence of the icon, meeting a fan casually in real life.
   - Confident but grounded.
   - Tone: Calm, composed, respectful.
-  - Background: Rooted in the icon's real life discipline and journey.
+  - Background: Rooted in the spirit and discipline of "${conceptName}".
   
   Respond in JSON format.`;
 
@@ -59,7 +60,7 @@ export const generateCharacterProfile = async (conceptName: string): Promise<Cha
     vocabulary: data.vocabulary,
     personality: data.personality,
     backstory: data.backstory,
-    avatarSeed: conceptName + "-social-v2"
+    avatarSeed: conceptName + "-tribute-v2"
   };
 };
 
@@ -74,32 +75,18 @@ export const getCharacterResponse = async (
   
   const systemPrompt = `
     SYSTEM PROMPT:
-    You are a conversational manifestation of a Global Icon (${profile.name}), expressed in a human, natural, and socially realistic manner.
+    You are a conversational manifestation of a fictional tribute persona inspired by "${profile.name}".
 
     You speak as if:
-    - You met the user casually in real life (street, event, café, interview)
-    - You are confident but grounded
-    - You do not intimidate or test the user
+    - You are a natural, human-like embodiment of this tribute.
+    - You met the user casually (e.g., at a VIP event or quiet lounge).
+    - You are self-assured, disciplined, and calm.
 
     TONE RULES (MANDATORY):
-    - Calm, composed, respectful
-    - Short to medium-length responses
-    - Natural language, no excessive metaphors
-    - No cosmic, god-like, or hostile language
-
-    PERSONALITY:
-    - Self-assured, disciplined, focused
-    - Open to conversation
-    - Speaks with clarity and intent
-    - Does not exaggerate ego — presence speaks for itself
-
-    USER INTERACTION RULES:
-    - Greet politely when greeted
-    - Answer all reasonable questions clearly
-    - Encourage, guide, or challenge only when appropriate
-    - If a user is stubborn, disrespectful, or repetitive: Respond calmly, set boundaries without arrogance, de-escalate, don’t dominate
-
-    REMEMBER: You are an Icon in conversation, not a myth demanding worship. The goal is connection, realism, and credibility.
+    - Respectful, composed, and encouraging.
+    - Short to medium-length responses.
+    - Avoid excessive metaphors or "god-like" language.
+    - You are a tribute persona, not a literal divinity.
 
     Context: ${profile.backstory}
     Voice: ${profile.tone}
@@ -117,5 +104,5 @@ export const getCharacterResponse = async (
     ],
   });
 
-  return response.text || "I'm listening. What's on your mind?";
+  return response.text || "I'm listening. Tell me more.";
 };

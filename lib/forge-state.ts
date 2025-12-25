@@ -1,3 +1,4 @@
+
 export type ForgeState = 
   | 'DORMANT' 
   | 'CONVENING' 
@@ -10,12 +11,13 @@ export type ForgeState =
 
 export const FORGE_MESSAGES = {
   SUSPENDED: "The Forge is resting. Current formation capacity has been reached.",
-  FAILED: "Formation could not be completed. The Forge will reopen shortly.",
+  FAILED: "Forge is busy or your network is unstable. Please try again in a few seconds.",
   FORGING: "MANIFESTING ARTIFACT...",
   QUEUED: "CONVENING NEURAL RECURSION...",
   DORMANT: "FORGE CAPACITY: READY",
-  TIMEOUT: "Forge timed out. Try again.", // Exact requirement string from Rule 1
-  QUOTA: "High-fidelity lanes full. Fast Forge Mode Activated."
+  TIMEOUT: "Forge is busy or your network is unstable. Please try again in a few seconds.", 
+  QUOTA: "You’ve reached your Forge limit. Please wait or upgrade to continue forging.",
+  LOADING: "Forge is loading… please wait a moment."
 };
 
 export interface ForgeLog {

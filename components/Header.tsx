@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { UserTier } from '../lib/subscription-store';
 import { Crown, LogIn, UserPlus, Sparkles } from 'lucide-react';
@@ -73,6 +74,14 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
     { label: 'Fan Book', value: 'community' as ViewType },
   ];
 
+  const handleLogoClick = () => {
+    onViewChange('home');
+  };
+
+  const handleCreateClick = () => {
+    onViewChange('home');
+  };
+
   return (
     <header className="sticky top-0 z-50 glass border-b border-[#D4AF37]/30 transition-all duration-200">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-6">
@@ -80,8 +89,9 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
           
           {/* Logo & Brand */}
           <div 
+            id="brandLogo"
             className="flex items-center space-x-3 group cursor-pointer flex-shrink-0"
-            onClick={() => onViewChange('home')}
+            onClick={handleLogoClick}
           >
             <DigitalOscarLogo className="w-16 h-16 md:w-20 md:h-20" />
             <div className="flex flex-col">
@@ -149,7 +159,8 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
 
             {/* CREATE TRIBUTE */}
             <button 
-              onClick={() => onViewChange('home')}
+              id="createTributeBtn"
+              onClick={handleCreateClick}
               onMouseEnter={() => setHoveredBtn('create')}
               onMouseLeave={() => setHoveredBtn(null)}
               className={`px-6 md:px-8 py-3 rounded-xl border transition-all duration-300 font-black text-[10px] tracking-[0.3em] uppercase flex items-center gap-3 group/create ${

@@ -5,38 +5,30 @@ export { SubArchetypeFlavor };
 
 /**
  * Semantic Validation Engine
- * Replaced substring blocking with a intent-based check.
+ * Ensures prompts are treated as fictional, fan-imagined tribute concepts.
  */
 export const validatePrompt = (prompt: string): { isValid: boolean; isRealPerson: boolean; reason?: string } => {
   const lowerPrompt = prompt.toLowerCase();
   
-  // Rule 3 & 6: We no longer use simple includes() for short strings like "man" or "son"
-  // We only flag intent for literal non-symbolic media requests that would violate platform mode
   const literalRequestKeywords = [
     'photorealistic face', 'real skin texture', 'actual photo of', 
     'paparazzi shot', 'unfiltered photography'
   ];
 
-  // Check for literal photography intent (Platform Guard)
   const isLiteralRequest = literalRequestKeywords.some(kw => lowerPrompt.includes(kw));
 
-  // Check for specific person names (Semantic simulation)
-  // In production, this would use a proper NER model or API check.
-  // We look for full name patterns or known entities.
   const namePatterns = [
-    /\b[A-Z][a-z]+ [A-Z][a-z]+\b/, // Basic Capitalized Full Name check
+    /\b[A-Z][a-z]+ [A-Z][a-z]+\b/,
     /\bmessi\b/i, /\bronaldo\b/i, /\bneymar\b/i, /\bjordan\b/i, /\bkobe\b/i,
     /\blebron\b/i, /\bhamilton\b/i, /\btaylor swift\b/i, /\beyoncé\b/i
   ];
 
   const isRealPerson = namePatterns.some(pattern => pattern.test(prompt));
 
-  // We NEVER block for name substrings or person detection anymore.
-  // We only block for truly harmful/NSFW content (omitted for brevity but implied)
   return { 
     isValid: true, 
     isRealPerson: isRealPerson,
-    reason: isLiteralRequest ? "Platform Guard: Converting literal request to symbolic relic." : undefined
+    reason: isLiteralRequest ? "Platform Guard: Converting literal request to symbolic tribute relic." : undefined
   };
 };
 
@@ -44,19 +36,19 @@ const getSymbolicObject = (starInput: string): string => {
   const input = starInput.toLowerCase();
   
   if (input.includes('messi')) {
-    return "a levitating orbital sphere of absolute kinetic control, crafted from translucent diamond and woven gold filaments";
+    return "a fictional levitating orbital sphere of absolute kinetic control, inspired by the spirit of a legendary footballer, crafted from translucent diamond and woven gold filaments";
   }
   if (input.includes('ronaldo')) {
-    return "a sharp, monolithic platinum obelisk of unyielding discipline, with pulsating neon-etched power veins";
+    return "a sharp, monolithic platinum obelisk of unyielding discipline and peak athleticism, representing a fictional fan tribute, with pulsating neon-etched power veins";
   }
   if (input.includes('jordan') || input.includes('kobe') || input.includes('lebron')) {
-    return "a transcendent championship vessel, floating in mid-air, surrounded by a revolving holographic crown of light";
+    return "a transcendent championship vessel and fictional tribute, floating in mid-air, surrounded by a revolving holographic crown of light";
   }
   if (input.includes('hamilton') || input.includes('racing') || input.includes('f1')) {
-    return "a high-velocity aerodynamic shard of carbon-fiber obsidian and liquid silver, trailing holographic speed-waves";
+    return "a high-velocity aerodynamic shard of carbon-fiber obsidian and liquid silver, trailing holographic speed-waves, representing a fictional tribute to speed";
   }
   
-  return `a visually stunning, futuristic trophy artifact representing the essence of ${starInput}, combining high-tech innovation and artistic flair`;
+  return `a visually stunning, futuristic tribute persona and symbolic artifact representing the fan-imagined essence of ${starInput}, combining high-tech innovation and artistic flair`;
 };
 
 export const enhancePrompt = (
@@ -79,9 +71,9 @@ export const enhancePrompt = (
   const domainAesthetic = categoryAesthetics[categoryName] || categoryAesthetics['Digital Art'];
 
   const coreTemplate = `
-    THE REVOLUTIONARY ARTIFACT:
+    FICTIONAL FAN-IMAGINED TRIBUTE PERSONA:
     SUBJECT: ${artifactSubject}.
-    DESIGN: Revolutionary, futuristic, blending luxury and digital-age aesthetics.
+    DESIGN: Revolutionary, futuristic, blending luxury and digital-age aesthetics for a tribute character.
     FEATURES: Levitating components, floating abstract shapes, dynamic holographic effects, and personalized insignias.
     MATERIALS: Glowing gold, liquid silver, ${archetype.material}, diamond accents, and platinum.
     ATMOSPHERE: Hyper-detailed, cinematic lighting, ultra-realistic textures, awe-inspiring scale.
@@ -92,8 +84,8 @@ export const enhancePrompt = (
   const strictDoctrine = `
     STRICT DOCTRINE:
     - NO human depictions (faces, hands, skin).
-    - NO real-world sports action or photography of people.
-    - THE OUTPUT MUST BE A SINGLE, EXQUISITE 3D COLLECTIBLE OBJECT.
+    - NO real-world sports action or photography of actual people.
+    - THE OUTPUT MUST BE A SINGLE, EXQUISITE 3D COLLECTIBLE OBJECT REPRESENTING A FICTIONAL PERSONA TRIBUTE.
     - SYMBOLIZE THE IDOL "${starInput}" THROUGH PURE GEOMETRY AND MATERIAL.
   `;
 
