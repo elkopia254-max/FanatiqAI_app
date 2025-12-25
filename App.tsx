@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Header, { ViewType } from './components/Header';
 import Hero from './components/Hero';
@@ -15,104 +16,150 @@ import { enhancePrompt, validatePrompt, SubArchetypeFlavor } from './lib/prompt-
 import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
-import { ForgeState, FORGE_MESSAGES } from './lib/forge-state';
+import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
+import { Shield, Globe, Star, Users, ArrowLeft, Sparkles, Crown, Zap, ShieldAlert, MessageSquare, Clock, X } from 'lucide-react';
 
 /**
- * FORGE REST SCREEN (BRAND LAW)
- * A high-luxury transition screen that replaces technical failures with a dignified "Rest" state.
+ * STATIC PAGE COMPONENT
  */
-const ForgeRestScreen: React.FC<{ 
-  onReset: () => void; 
-  isFailed?: boolean; 
-  customMessage?: string 
-}> = ({ onReset, isFailed, customMessage }) => (
-  <div className="forge-veil flex flex-col items-center justify-center text-center p-8 space-y-10 animate-in fade-in duration-1000">
-    <div className="w-24 h-24 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-600 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-       <div className={`w-3 h-3 rounded-full ${isFailed ? 'bg-[#D4AF37]/50' : 'bg-neutral-700 animate-pulse'}`} />
-    </div>
-    <div className="space-y-6">
-      <h2 className="font-cinzel text-2xl md:text-3xl tracking-[0.3em] uppercase text-[#D4AF37] drop-shadow-md">
-        {isFailed ? 'FORMATION STALLED' : 'RESONANCE REST'}
-      </h2>
-      <p className="font-inter text-neutral-400 max-w-lg mx-auto tracking-widest uppercase text-[10px] leading-relaxed px-6 opacity-80">
-        {customMessage || (isFailed ? FORGE_MESSAGES.FAILED : FORGE_MESSAGES.SUSPENDED)}
-      </p>
-    </div>
+const StaticPage: React.FC<{ 
+  title: string; 
+  subtitle: string; 
+  icon: React.ReactNode; 
+  onBack: () => void;
+  children?: React.ReactNode;
+}> = ({ title, subtitle, icon, onBack, children }) => (
+  <div className="py-20 animate-in fade-in slide-in-from-bottom-8 duration-700">
     <button 
-      onClick={onReset}
-      className="text-[9px] font-black tracking-[0.5em] text-[#D4AF37]/40 hover:text-[#D4AF37] uppercase transition-all"
+      onClick={onBack}
+      className="mb-12 flex items-center gap-4 text-[9px] font-black tracking-[0.4em] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase transition-all"
     >
-      [ RETURN TO CORE ]
+      <ArrowLeft size={14} /> Back to core
     </button>
+    
+    <div className="flex flex-col items-center text-center mb-24">
+      <div className="w-20 h-20 rounded-3xl border border-[#D4AF37]/20 bg-neutral-950 flex items-center justify-center text-[#D4AF37] mb-8 shadow-2xl">
+        {icon}
+      </div>
+      <h1 className="text-4xl md:text-6xl font-cinzel font-bold text-white tracking-[0.2em] uppercase mb-6 drop-shadow-2xl">
+        {title}
+      </h1>
+      <p className="text-[11px] font-black tracking-[0.6em] text-[#D4AF37] uppercase opacity-80 max-w-xl mx-auto leading-relaxed">
+        {subtitle}
+      </p>
+      <div className="mt-12 h-[1px] w-32 bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent" />
+    </div>
+
+    <div className="max-w-4xl mx-auto glass p-12 md:p-20 rounded-[4rem] border-[#D4AF37]/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
+      {children || (
+        <div className="space-y-12 text-neutral-400 text-sm leading-relaxed tracking-wide font-light">
+          <p className="italic">“In the digital multiverse, legacy is the only true currency. FanatiqAI stands at the intersection of neural excellence and fan devotion, crafting eternal sigils for the icons that define our era.”</p>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+/**
+ * FORGE STATUS NOTIFICATION (Informational Only)
+ */
+const ForgeStatusNotification: React.FC<{ 
+  onDismiss: () => void; 
+  isFailed?: boolean; 
+  message?: string 
+}> = ({ onDismiss, isFailed, message }) => (
+  <div className="fixed bottom-10 right-10 z-[300] pointer-events-none animate-in slide-in-from-right-10 fade-in duration-500">
+    <div className="glass p-6 rounded-[2rem] border-[#D4AF37]/30 shadow-2xl backdrop-blur-2xl pointer-events-auto flex items-center gap-6 max-w-sm">
+      <div className={`flex-shrink-0 w-12 h-12 rounded-2xl border flex items-center justify-center ${isFailed ? 'border-[#D4AF37]/50 bg-[#D4AF37]/5' : 'border-neutral-800 bg-neutral-900'}`}>
+        <div className={`w-2 h-2 rounded-full ${isFailed ? 'bg-[#D4AF37] shadow-[0_0_10px_#D4AF37]' : 'bg-neutral-600 animate-pulse'}`} />
+      </div>
+      <div className="flex-1 space-y-1">
+        <h4 className="text-[10px] font-black tracking-[0.2em] text-[#D4AF37] uppercase font-cinzel">
+          CORE ALERT
+        </h4>
+        <p className="text-[10px] text-neutral-400 font-bold tracking-widest leading-relaxed uppercase">
+          {message}
+        </p>
+      </div>
+      <button onClick={onDismiss} className="text-neutral-600 hover:text-white transition-colors">
+        <X size={14} />
+      </button>
+    </div>
   </div>
 );
 
 const App: React.FC = () => {
-  const [activeView, setActiveView] = useState<ViewType>('home');
+  const [activeView, setActiveView] = useState<ViewType>(() => {
+    return (localStorage.getItem('fanatiq_active_view') as ViewType) || 'home';
+  });
+  
+  // UI PERSISTENCE: Inputs must remain rendered and stored
+  const [persistedPrompt, setPersistedPrompt] = useState(() => localStorage.getItem('fanatiq_last_prompt') || '');
+  const [persistedArchetype, setPersistedArchetype] = useState<SubArchetypeFlavor>(() => (localStorage.getItem('fanatiq_last_archetype') as SubArchetypeFlavor) || 'classical');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(() => Number(localStorage.getItem('fanatiq_last_category')) || 1);
+
+  // ASYNC STATE
   const [forgeState, setForgeState] = useState<ForgeState>('DORMANT');
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [timelineArtifact, setTimelineArtifact] = useState<TimelineArtifact | null>(null);
   const [chatConcept, setChatConcept] = useState<string | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
+  const [queuePosition, setQueuePosition] = useState<number | null>(null);
+  const [isFailsafeActive, setIsFailsafeActive] = useState(false);
   
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   
   const { state: subState, recordGeneration, canGenerate, upgradeToPro, downgradeToFree } = useSubscription();
 
-  // Root Forge Guard: Ensures state dignity during fatal errors
   const forgeStateRef = useRef<ForgeState>(forgeState);
-  useEffect(() => { forgeStateRef.current = forgeState; }, [forgeState]);
+  const watchdogRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    const handleFatalError = () => {
-      setForgeState("SUSPENDED");
-      return true; 
-    };
-    window.onerror = handleFatalError;
-    window.onunhandledrejection = handleFatalError;
-    return () => {
-      window.onerror = null;
-      window.onunhandledrejection = null;
-    };
-  }, []);
+  // Persistence Sync
+  useEffect(() => { 
+    forgeStateRef.current = forgeState;
+    localStorage.setItem('fanatiq_active_view', activeView);
+    localStorage.setItem('fanatiq_last_prompt', persistedPrompt);
+    localStorage.setItem('fanatiq_last_archetype', persistedArchetype);
+    localStorage.setItem('fanatiq_last_category', selectedCategoryId.toString());
+  }, [forgeState, activeView, persistedPrompt, persistedArchetype, selectedCategoryId]);
 
-  const selectedCategory = categories.find(c => c.id === selectedCategoryId) || categories[0];
-
-  useEffect(() => {
-    const observerOptions = { threshold: 0.1 };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('active');
-      });
-    }, observerOptions);
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, [activeView, forgeState]);
+  const clearWatchdog = () => {
+    if (watchdogRef.current) {
+      window.clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
+    }
+  };
 
   /**
-   * SAFE GENERATE (CORE PROTOCOL)
-   * The atomic wrapper for all multi-modal Gemini API calls.
+   * 20s HARD UI TIMEOUT
    */
-  const safeGenerate = async (starInput: string, archetype: SubArchetypeFlavor): Promise<{ images: string[], timeline: TimelineArtifact } | null> => {
-    // Protocol Guard: Only proceed if forging state is active
-    if (forgeStateRef.current !== "FORGING") return null;
+  const startWatchdog = () => {
+    clearWatchdog();
+    watchdogRef.current = window.setTimeout(() => {
+      if (forgeStateRef.current === 'FORGING' || forgeStateRef.current === 'QUEUED' || forgeStateRef.current === 'SEALED') {
+        logForgeEvent('timeout', 'Job exceeded 20s hard limit. Restoration triggered.');
+        setStatusMessage("Forge ready.");
+        setForgeState('DORMANT'); 
+        localStorage.setItem('fanatiq_job_active', 'false');
+      }
+    }, 20000);
+  };
 
+  const safeGenerate = async (starInput: string, archetype: SubArchetypeFlavor, useFailsafe: boolean = false): Promise<{ images: string[], timeline: TimelineArtifact } | null> => {
+    const selectedCategory = categories.find(c => c.id === selectedCategoryId) || categories[0];
     const enhancedPrompt = enhancePrompt(starInput, archetype, selectedCategory.name);
-    
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const imageCount = subState.tier === 'pro' ? 4 : 1;
+      const imageCount = useFailsafe ? 1 : (subState.tier === 'pro' ? 4 : 1);
+      const modelName = useFailsafe ? 'gemini-flash-lite-latest' : 'gemini-2.5-flash-image';
 
-      // Atomic Image Manifestation
       const imagePromise = (async () => {
         try {
           const results: string[] = [];
           const generationTasks = Array(imageCount).fill(null).map(() => 
             ai.models.generateContent({
-              model: 'gemini-2.5-flash-image',
+              model: modelName,
               contents: { parts: [{ text: enhancedPrompt }] },
             })
           );
@@ -128,56 +175,54 @@ const App: React.FC = () => {
             }
           });
           return results.length > 0 ? results : null;
-        } catch { return null; }
+        } catch (err: any) { 
+          if (err.message?.includes('429')) setIsFailsafeActive(true);
+          return null; 
+        }
       })();
 
-      // Atomic Timeline Chronicling
       const timelinePromise = (async () => {
         try { return await generateTimeline(starInput); } catch { return null; }
       })();
 
       const [images, timeline] = await Promise.all([imagePromise, timelinePromise]);
-      
       if (!images || !timeline) return null;
       return { images, timeline };
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   };
 
-  /**
-   * BEGIN FORMATION (STATE PROTOCOL)
-   * Strictly adheres to the transition: SEALED -> FORGING -> GENERATE -> COMPLETED/SUSPENDED
-   */
   const beginFormation = async (starInput: string, archetype: SubArchetypeFlavor) => {
-    if (!canGenerate) return;
+    clearWatchdog();
+    localStorage.setItem('fanatiq_job_active', 'true');
+    setGeneratedImages([]);
+    setTimelineArtifact(null);
+    setIsFailsafeActive(false);
+    setStatusMessage(null);
 
-    // 1. Pre-validation Integrity
+    // Rule 1, 2, 5 & 6: We use semantic validation but NEVER block formations for names.
     const validation = validatePrompt(starInput);
     if (!validation.isValid) {
-      setValidationError(validation.reason || "Doctrine Violation Detected");
+      logForgeEvent('api_failure', "Integrity Fault");
       setForgeState('FAILED');
+      setTimeout(() => setForgeState('DORMANT'), 800);
       return;
     }
 
-    // 2. Initial Sealing
+    // Rule 5: Show specialized message for real-world identity detection
+    if (validation.isRealPerson) {
+      setStatusMessage("Symbolic avatar created in respect of real-world identity.");
+    }
+
     setForgeState("SEALED");
-    setValidationError(null);
-    setGeneratedImages([]);
-    setTimelineArtifact(null);
     setChatConcept(starInput);
+    startWatchdog();
 
-    // Minor delay to manifest sealing visuals
-    await new Promise(r => setTimeout(r, 400));
-
-    // 3. Initiate Forging
-    setForgeState("FORGING");
-    forgeStateRef.current = "FORGING"; // Direct ref update for safeGenerate check
-
-    // 4. Atomic Execution
+    // Async Job Isolation
     const result = await safeGenerate(starInput, archetype);
+    
+    clearWatchdog();
+    localStorage.setItem('fanatiq_job_active', 'false');
 
-    // 5. Finalize State
     if (result) {
       setGeneratedImages(result.images);
       setTimelineArtifact(result.timeline);
@@ -187,7 +232,9 @@ const App: React.FC = () => {
         document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
     } else {
-      setForgeState("SUSPENDED");
+      setForgeState("DORMANT");
+      // Keep existing user status if real person was detected, otherwise show ready
+      if (!validation.isRealPerson) setStatusMessage("Forge ready.");
     }
   };
 
@@ -197,21 +244,15 @@ const App: React.FC = () => {
   };
 
   const renderHomeContent = () => {
-    if (forgeState === 'SUSPENDED' || forgeState === 'FAILED') {
-      return (
-        <ForgeRestScreen 
-          onReset={() => {
-            setForgeState('DORMANT');
-            setValidationError(null);
-          }} 
-          isFailed={forgeState === 'FAILED'} 
-          customMessage={validationError || undefined}
-        />
-      );
-    }
-
     return (
-      <div className="space-y-12 animate-in fade-in duration-500">
+      <div className="space-y-12 animate-in fade-in duration-500 relative">
+        {statusMessage && (
+          <ForgeStatusNotification 
+            onDismiss={() => setStatusMessage(null)} 
+            message={statusMessage}
+          />
+        )}
+
         <section className="reveal active relative z-10">
           <Hero 
             selectedCategoryId={selectedCategoryId} 
@@ -222,19 +263,31 @@ const App: React.FC = () => {
           />
         </section>
         
-        <section id="generate" className="reveal relative z-[100] space-y-6">
+        <section id="generate" className="reveal active relative z-[100] space-y-6">
           <PromptGenerator 
             onGenerate={beginFormation} 
             forgeState={forgeState}
             tier={subState.tier} 
             cooldown={subState.cooldownRemaining}
             canGenerate={canGenerate}
+            initialPrompt={persistedPrompt}
+            initialArchetype={persistedArchetype}
+            onPromptChange={setPersistedPrompt}
+            onArchetypeChange={setPersistedArchetype}
             onInputFocus={() => {
               if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') {
                 setForgeState('CONVENING');
               }
             }}
           />
+
+          {isFailsafeActive && (
+            <div className="max-w-md mx-auto py-2 px-6 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center gap-3 justify-center">
+              <Zap size={12} className="text-[#D4AF37] animate-pulse" />
+              <span className="text-[8px] font-black tracking-[0.2em] text-[#D4AF37] uppercase">High Performance Optimized</span>
+            </div>
+          )}
+
           <UsageTracker 
             state={subState} 
             forgeState={forgeState}
@@ -247,22 +300,13 @@ const App: React.FC = () => {
             <section id="command-center" className="reveal active py-12 relative z-10">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 <div className="lg:col-span-8">
-                  <ResultsSection 
-                    isLoading={false} 
-                    images={generatedImages} 
-                    tier={subState.tier} 
-                    gridColsOverride="grid-cols-1 md:grid-cols-2" 
-                  />
+                  <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" />
                 </div>
                 <div className="lg:col-span-4 sticky top-24 h-auto lg:h-[calc(100vh-140px)] min-h-[600px] z-10">
-                  <FanChat 
-                    initialConcept={chatConcept} 
-                    isSidebarMode={true} 
-                  />
+                  <FanChat initialConcept={chatConcept} isSidebarMode={true} />
                 </div>
               </div>
             </section>
-
             <section id="timeline-archive" className="reveal active py-12 relative z-10">
               <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
             </section>
@@ -272,36 +316,21 @@ const App: React.FC = () => {
     );
   };
 
-  const renderContent = () => {
-    switch (activeView) {
-      case 'trending':
-        return <section className="reveal active py-20"><Gallery title="G.O.A.T" type="trending" /></section>;
-      case 'community':
-        return <section className="reveal active py-20"><Gallery title="Fan Book" type="community" /></section>;
-      case 'fanchat':
-        return (
-          <section className="reveal active py-20">
-            <FanChat initialConcept={chatConcept} />
-          </section>
-        );
-      case 'pricing':
-        return <section className="reveal active py-20"><Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? upgradeToPro : downgradeToFree} /></section>;
-      case 'home':
-      default:
-        return renderHomeContent();
-    }
-  };
-
   return (
     <div className="min-h-screen granite-texture bg-[#0d0d0d] overflow-x-hidden selection:bg-[#D4AF37] selection:text-black">
-      <Header 
-        tier={subState.tier} 
-        activeView={activeView} 
-        onViewChange={handleViewChange} 
-        onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }}
-      />
+      <Header tier={subState.tier} activeView={activeView} onViewChange={handleViewChange} onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }} />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 relative">
-        {renderContent()}
+        {activeView === 'home' ? renderHomeContent() : (
+          <div className="animate-in fade-in duration-700">
+            {activeView === 'trending' && <Gallery title="G.O.A.T" type="trending" />}
+            {activeView === 'community' && <Gallery title="Fan Book" type="community" />}
+            {activeView === 'fanchat' && <FanChat initialConcept={chatConcept} />}
+            {activeView === 'pricing' && <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? upgradeToPro : downgradeToFree} />}
+            {activeView === 'about' && <StaticPage title="The Origin" subtitle="REDEFINING THE FAN EXPERIENCE" icon={<Users />} onBack={() => handleViewChange('home')} />}
+            {activeView === 'law' && <StaticPage title="Multiverse Law" subtitle="THE SACRED DOCTRINE" icon={<Shield />} onBack={() => handleViewChange('home')} />}
+            {activeView === 'goat' && <StaticPage title="What is G.O.A.T?" subtitle="THE HIGHEST RESONANCE" icon={<Star />} onBack={() => handleViewChange('home')} />}
+          </div>
+        )}
       </main>
       <Footer onViewChange={handleViewChange} />
       <AuthModals isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode={authMode} />

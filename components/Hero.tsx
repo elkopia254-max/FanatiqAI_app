@@ -8,12 +8,12 @@ interface Props {
 
 const Hero: React.FC<Props> = ({ selectedCategoryId, onCategorySelect }) => {
   return (
-    <div className="relative pt-8 pb-4 flex flex-col items-center text-center overflow-visible">
+    <div id="sub-category-selector" className="relative pt-8 pb-4 flex flex-col items-center text-center overflow-visible">
       {/* Dynamic light sources */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#D4AF37]/10 blur-[150px] rounded-full -z-10 float" />
       <div className="absolute -left-1/4 top-1/4 w-[400px] h-[400px] bg-[#D4AF37]/5 blur-[120px] rounded-full -z-10 float" style={{ animationDelay: '2s' }} />
       
-      <div className="space-y-10 max-w-7xl px-4 stagger-reveal">
+      <div className="space-y-10 max-w-7xl px-4 stagger-reveal active">
         <div className="space-y-5">
           <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full border border-[#D4AF37]/20 bg-[#D4AF37]/5 text-[#D4AF37] text-[9px] font-black tracking-[0.4em] backdrop-blur-sm transition-all hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/10 cursor-default uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />

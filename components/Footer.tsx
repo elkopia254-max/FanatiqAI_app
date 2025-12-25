@@ -1,133 +1,192 @@
 import React from 'react';
-import { HelpCircle, Shield, Copyright, Sparkles, MessageCircle, ArrowUpRight } from 'lucide-react';
+import { Sparkles, Globe, Star, Shield, Users } from 'lucide-react';
 import { ViewType } from './Header';
 
 interface Props {
   onViewChange?: (view: ViewType) => void;
 }
 
-const Footer: React.FC<Props> = ({ onViewChange }) => {
-  const footerLinks = [
-    {
-      id: 'guide',
-      label: 'User Guide',
-      icon: <HelpCircle size={14} />,
-      content: '“Step-by-step instructions to create meaningful tributes for your favorite stars or clubs. Simple, intuitive, and fan-focused.”'
-    },
-    {
-      id: 'legal',
-      label: 'Legal Policy',
-      icon: <Shield size={14} />,
-      content: '“We respect your rights and privacy. All interactions on FanatiqAI follow ethical, transparent, and legally compliant standards.”'
-    },
-    {
-      id: 'copyright',
-      label: 'Copyright',
-      icon: <Copyright size={14} />,
-      content: '“FanatiqAI honors all original works. Please ensure your tributes respect copyrights and the creativity of others.”'
-    },
-    {
-      id: 'brand',
-      label: 'Our Brand',
-      icon: <Sparkles size={14} />,
-      content: '“Discover the mission behind FanatiqAI: to empower true fans to create, honor, and preserve the legacies of the stars they love.”'
-    },
-    {
-      id: 'contact',
-      label: 'Contact Us',
-      icon: <MessageCircle size={14} />,
-      content: '“Have questions or ideas? Reach out to our team and we’ll help you make the most of your FanatiqAI experience.”'
-    }
-  ];
+const DigitalOscarLogo = ({ className = "w-20 h-20" }) => (
+  <div className={`relative flex items-center justify-center ${className} group cursor-pointer overflow-visible`}>
+    <div className="absolute inset-0 bg-[#D4AF37]/5 blur-[60px] rounded-full scale-[3] group-hover:bg-[#D4AF37]/15 transition-all duration-1000 pointer-events-none" />
+    <svg viewBox="0 0 200 200" className="w-full h-full relative z-10 drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)] overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="obsidianDeep" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1a1a1a" />
+          <stop offset="100%" stopColor="#050505" />
+        </linearGradient>
+        <linearGradient id="chromePolished" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#A0A0A0" />
+          <stop offset="25%" stopColor="#E0E0E0" />
+          <stop offset="50%" stopColor="#FFFFFF" />
+          <stop offset="75%" stopColor="#E0E0E0" />
+          <stop offset="100%" stopColor="#808080" />
+        </linearGradient>
+        <linearGradient id="goldAccolade" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#F9E29C" />
+          <stop offset="50%" stopColor="#D4AF37" />
+          <stop offset="100%" stopColor="#8B7326" />
+        </linearGradient>
+        <filter id="prestigeGlow">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+      <g className="transition-transform duration-700 group-hover:translate-y-[1px]">
+        <path d="M40 190 L160 190 L150 175 L50 175 Z" fill="url(#obsidianDeep)" stroke="#111" strokeWidth="0.5" />
+        <path d="M55 175 L145 175 L138 165 L62 165 Z" fill="#080808" stroke="#222" strokeWidth="0.5" />
+        <path d="M70 165 L130 165 L125 160 L75 160 Z" fill="#0c0c0c" stroke="url(#chromePolished)" strokeWidth="0.3" opacity="0.6" />
+      </g>
+      <g className="transition-all duration-1000 group-hover:scale-[1.02] origin-bottom">
+        <path d="M80 160 L120 160 L125 30 L100 20 L75 30 L80 160 Z" fill="url(#obsidianDeep)" stroke="url(#chromePolished)" strokeWidth="0.5" opacity="0.95" />
+        <path d="M78 160 L73 30 L76 28 L81 160 Z" fill="url(#chromePolished)" opacity="0.8" />
+        <path d="M122 160 L127 30 L124 28 L119 160 Z" fill="url(#chromePolished)" opacity="0.8" />
+        <path d="M100 155 L115 140 L115 45 L100 35 L85 45 L85 140 Z" fill="#000" stroke="url(#goldAccolade)" strokeWidth="0.8" strokeOpacity="0.3" />
+      </g>
+      <g className="transition-all duration-700 group-hover:translate-y-[-2px]">
+        <path d="M100 115 L125 100 L125 70 L100 55 L75 70 L75 100 Z" fill="rgba(0,0,0,0.8)" stroke="url(#goldAccolade)" strokeWidth="1.2" filter="url(#prestigeGlow)" />
+        <circle cx="100" cy="85" r="25" fill="url(#goldAccolade)" opacity="0.08" filter="url(#prestigeGlow)" />
+        <g transform="translate(86, 74) scale(0.72)">
+          <path d="M5 5 L40 5 L35 15 L15 15 L15 28 L32 28 L28 38 L15 38 L15 65 L5 65 Z" fill="url(#goldAccolade)" />
+        </g>
+      </g>
+      <path d="M90 25 L110 25 L100 15 Z" fill="url(#chromePolished)" filter="url(#prestigeGlow)" />
+    </svg>
+  </div>
+);
 
-  const coreNav = [
-    { label: 'Create Tribute', value: 'home' as ViewType },
-    { label: 'G.O.A.T', value: 'trending' as ViewType },
-    { label: 'Fan Book', value: 'community' as ViewType },
-    { label: 'Fan Chat', value: 'fanchat' as ViewType },
-    { label: 'Pricing', value: 'pricing' as ViewType },
+const Footer: React.FC<Props> = ({ onViewChange }) => {
+  const columns = [
+    {
+      title: 'THE UNIVERSE',
+      icon: <Globe size={14} className="text-[#D4AF37]" />,
+      links: [
+        { label: 'About FanatiqAI', value: 'about' as ViewType },
+        { label: 'Rewrite the Multiverse', value: 'law' as ViewType },
+        { label: 'What is G.O.A.T?', value: 'goat' as ViewType },
+        { label: 'How FanatiqAI Works', value: 'how-it-works' as ViewType },
+        { label: 'FanatiqAI Manifesto', value: 'manifesto' as ViewType },
+      ],
+    },
+    {
+      title: 'THE STARS',
+      icon: <Star size={14} className="text-[#D4AF37]" />,
+      links: [
+        { label: 'Trending G.O.A.Ts', value: 'trending' as ViewType },
+        { label: 'Top Clubs', value: 'clubs-top' as ViewType },
+        { label: 'New Tributes', value: 'tributes-new' as ViewType },
+        { label: 'Legendary Tributes', value: 'tributes-legendary' as ViewType },
+        { label: 'Fan Rankings', value: 'rankings' as ViewType },
+      ],
+    },
+    {
+      title: 'THE FANS',
+      icon: <Users size={14} className="text-[#D4AF37]" />,
+      links: [
+        { label: 'Create a Tribute', value: 'home' as ViewType },
+        { label: 'Fan Book', value: 'community' as ViewType },
+        { label: 'Fan Chat', value: 'fanchat' as ViewType },
+        { label: 'Become a Fanatiq', value: 'pricing' as ViewType },
+        { label: 'Creator Levels & Badges', value: 'levels' as ViewType },
+      ],
+    },
+    {
+      title: 'THE LAW',
+      icon: <Shield size={14} className="text-[#D4AF37]" />,
+      links: [
+        { label: 'Terms of Service', value: 'terms' as ViewType },
+        { label: 'Privacy Policy', value: 'privacy' as ViewType },
+        { label: 'Copyright & Ownership', value: 'copyright' as ViewType },
+        { label: 'Community Rules', value: 'rules' as ViewType },
+        { label: 'DMCA / Report Abuse', value: 'report' as ViewType },
+        { label: 'Contact Support', value: 'support' as ViewType },
+      ],
+    },
   ];
 
   return (
-    <footer className="w-full bg-[#0a0a0a] py-20 px-4 border-t border-[#D4AF37]/20 mt-20 relative overflow-visible">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-20">
-          
-          {/* Brand Info */}
-          <div className="lg:col-span-4 space-y-8">
-            <div className="space-y-4">
-              <h2 className="text-[#D4AF37] font-cinzel font-bold text-2xl tracking-[0.4em] uppercase drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]">
-                FANATIQ<span className="text-white">AI</span>
-              </h2>
-              <p className="text-[11px] text-neutral-500 font-black tracking-[0.3em] uppercase leading-relaxed max-w-sm">
-                The definitive platform for the modern fan. Create, honor, and preserve the digital legacies of the stars you love through advanced neural manifestation.
-              </p>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-600 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 transition-all cursor-pointer">
-                <Sparkles size={18} />
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-600 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 transition-all cursor-pointer">
-                <MessageCircle size={18} />
-              </div>
-            </div>
+    <footer className="w-full bg-[#050505] pt-32 pb-16 px-6 relative overflow-hidden border-t border-[#D4AF37]/10">
+      {/* Cosmic Nebula Background Effect */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-[#D4AF37]/5 blur-[160px] rounded-full -z-10 pointer-events-none opacity-40" />
+      
+      <div className="max-w-[1600px] mx-auto relative z-10">
+        {/* Brand Header Mark */}
+        <div className="mb-24 flex flex-col items-center text-center">
+          <div 
+            className="mb-8 cursor-pointer transition-transform duration-700 hover:scale-110" 
+            onClick={() => onViewChange?.('home')}
+          >
+            <DigitalOscarLogo className="w-20 h-20" />
           </div>
-
-          {/* Core Navigation Access */}
-          <div className="lg:col-span-3 space-y-8">
-            <h4 className="text-[10px] font-black tracking-[0.5em] text-[#D4AF37] uppercase">CORE ACCESS</h4>
-            <nav className="flex flex-col gap-4">
-              {coreNav.map((nav) => (
-                <button
-                  key={nav.value}
-                  onClick={() => onViewChange?.(nav.value)}
-                  className="flex items-center justify-between text-[11px] font-bold tracking-[0.2em] text-neutral-400 hover:text-white transition-all group w-full text-left uppercase"
-                >
-                  {nav.label}
-                  <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1 group-hover:-translate-y-1" />
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {/* Context Popovers */}
-          <div className="lg:col-span-5 space-y-8">
-            <h4 className="text-[10px] font-black tracking-[0.5em] text-[#D4AF37] uppercase">DOCUMENTATION</h4>
-            <div className="flex flex-wrap gap-x-8 gap-y-6">
-              {footerLinks.map((link) => (
-                <div key={link.id} className="group relative">
-                  <button
-                    type="button"
-                    className="flex items-center gap-2.5 text-neutral-500 hover:text-[#D4AF37] transition-all duration-300 text-[10px] font-black tracking-[0.2em] uppercase focus:outline-none"
-                  >
-                    <span className="opacity-60 group-hover:opacity-100 transition-opacity">{link.icon}</span>
-                    {link.label}
-                  </button>
-                  
-                  {/* Hover Popover */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-6 w-64 p-5 bg-neutral-900/95 border border-[#D4AF37]/30 shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] backdrop-blur-xl">
-                    <div className="relative">
-                      <p className="text-[11px] text-neutral-300 leading-relaxed font-medium italic text-center tracking-wide">
-                        {link.content}
-                      </p>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 bg-neutral-900/95 border-b border-r border-[#D4AF37]/30 rotate-45 mt-[-1.5px]" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-[#D4AF37] font-cinzel font-bold text-3xl tracking-[0.5em] uppercase mb-4 cursor-pointer" onClick={() => onViewChange?.('home')}>
+            FANATIQ<span className="text-white">AI</span>
+          </h2>
+          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent" />
         </div>
 
-        {/* Legal Strip */}
-        <div className="pt-12 border-t border-neutral-900/50 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[9px] text-neutral-600 font-black tracking-[0.4em] uppercase">
-            © 2026 FANATIQAI • Forged For Future Fans
-          </p>
-          <div className="flex gap-8">
-            <span className="text-[8px] text-neutral-700 font-bold tracking-widest uppercase cursor-help hover:text-neutral-500 transition-colors">Privacy Shield</span>
-            <span className="text-[8px] text-neutral-700 font-bold tracking-widest uppercase cursor-help hover:text-neutral-500 transition-colors">Neural Policy</span>
-            <span className="text-[8px] text-neutral-700 font-bold tracking-widest uppercase cursor-help hover:text-neutral-500 transition-colors">Terms of Formation</span>
+        {/* Universe Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-8 mb-32">
+          {columns.map((col, idx) => (
+            <div key={idx} className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${idx * 150}ms` }}>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  {col.icon}
+                  <h4 className="text-[11px] font-black tracking-[0.4em] text-[#D4AF37] uppercase font-cinzel">
+                    {col.title}
+                  </h4>
+                </div>
+                <div className="relative w-full h-[1px] bg-neutral-900 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/40 to-transparent w-full" />
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-1 bg-[#D4AF37] rounded-full shadow-[0_0_10px_#D4AF37] animate-pulse" />
+                </div>
+              </div>
+
+              <nav className="flex flex-col gap-5">
+                {col.links.map((link, lIdx) => (
+                  <button
+                    key={lIdx}
+                    onClick={() => onViewChange?.(link.value)}
+                    className="group flex items-center gap-3 text-[10px] font-bold tracking-[0.2em] text-neutral-500 hover:text-white transition-all duration-300 uppercase text-left w-fit"
+                  >
+                    <div className="w-0 h-[1px] bg-[#D4AF37] group-hover:w-4 transition-all duration-500" />
+                    <span className="group-hover:translate-x-1 transition-transform duration-500">{link.label}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+          ))}
+        </div>
+
+        {/* Brand Law Strip */}
+        <div className="pt-16 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <p 
+              className="text-[10px] text-white/40 font-black tracking-[0.5em] uppercase cursor-pointer hover:text-white transition-colors"
+              onClick={() => onViewChange?.('law')}
+            >
+              © FANATIQAI — REWRITE THE MULTIVERSE
+            </p>
+            <p 
+              className="text-[8px] text-[#D4AF37]/60 font-black tracking-[0.3em] uppercase cursor-pointer hover:text-[#D4AF37] transition-colors"
+              onClick={() => onViewChange?.('copyright')}
+            >
+              All Tributes Belong to Their Fans.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-10">
+            <div className="flex gap-6">
+              {['Discord', 'X', 'Legacy'].map((social) => (
+                <button key={social} className="text-[9px] font-black tracking-widest text-neutral-600 hover:text-[#D4AF37] transition-colors uppercase">
+                  {social}
+                </button>
+              ))}
+            </div>
+            <div className="h-8 w-[1px] bg-neutral-900 hidden md:block" />
+            <div className="flex items-center gap-3 text-[9px] font-black tracking-[0.4em] text-neutral-600 uppercase">
+              <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
+              Core Synchronized
+            </div>
           </div>
         </div>
       </div>
