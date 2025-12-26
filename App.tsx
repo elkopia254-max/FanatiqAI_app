@@ -17,7 +17,7 @@ import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
 import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
-import { Sparkles, X, Terminal, ShieldAlert } from 'lucide-react';
+import { Sparkles, X, Terminal, ShieldAlert, BookOpen, Shield, HelpCircle, FileText, Info } from 'lucide-react';
 
 const ForgeVeil: React.FC<{ isActive: boolean; status?: string | null }> = ({ isActive, status }) => {
   const [dots, setDots] = useState('');
@@ -46,6 +46,67 @@ const ForgeVeil: React.FC<{ isActive: boolean; status?: string | null }> = ({ is
           <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#D4AF37] animate-progress" />
         </div>
         <p className="text-white/80 text-[10px] font-black tracking-[0.3em] uppercase opacity-70">FanatiqAI Premium Forge Lane Active</p>
+      </div>
+    </div>
+  );
+};
+
+const InfoView: React.FC<{ viewType: ViewType }> = ({ viewType }) => {
+  const titles: Record<string, string> = {
+    'about': 'ABOUT THE UNIVERSE',
+    'law': 'REWRITE THE MULTIVERSE',
+    'how-it-works': 'FORGE MECHANICS',
+    'manifesto': 'THE FANATIQ MANIFESTO',
+    'levels': 'CREATOR ASCENSION',
+    'terms': 'TERMS OF SERVICE',
+    'privacy': 'PRIVACY PROTOCOL',
+    'copyright': 'COPYRIGHT DOCTRINE',
+    'rules': 'COMMUNITY STATUTES',
+    'report': 'REPORT DISCORDANCE',
+    'support': 'NEURAL SUPPORT',
+    'goat': 'WHAT IS G.O.A.T?'
+  };
+
+  const icons: Record<string, React.ReactNode> = {
+    'about': <Info className="text-[#D4AF37]" size={32} />,
+    'law': <Shield className="text-[#D4AF37]" size={32} />,
+    'how-it-works': <HelpCircle className="text-[#D4AF37]" size={32} />,
+    'manifesto': <BookOpen className="text-[#D4AF37]" size={32} />,
+    'levels': <Sparkles className="text-[#D4AF37]" size={32} />,
+    'terms': <FileText className="text-[#D4AF37]" size={32} />,
+    'privacy': <Shield className="text-[#D4AF37]" size={32} />
+  };
+
+  return (
+    <div className="py-20 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700 px-4">
+      <div className="glass p-12 md:p-16 rounded-[4rem] border-[#D4AF37]/20 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-12 text-[#D4AF37]/5 pointer-events-none">
+          {icons[viewType] || <BookOpen size={200} />}
+        </div>
+        <div className="space-y-10 relative z-10">
+          <div className="space-y-4">
+            <h2 className="text-4xl md:text-5xl font-cinzel font-bold tracking-[0.2em] text-white uppercase drop-shadow-xl">
+              {titles[viewType] || 'DOCUMENTATION'}
+            </h2>
+            <div className="w-24 h-[1px] bg-[#D4AF37]" />
+          </div>
+          <div className="space-y-8 text-neutral-400 font-light leading-relaxed tracking-wide text-lg">
+            <p className="first-letter:text-5xl first-letter:font-cinzel first-letter:text-[#D4AF37] first-letter:mr-3 first-letter:float-left">
+              The FanatiqAI platform is a high-fidelity tribute environment designed for the celebration of legendary icons and clubs. 
+              Our neural core ensures every manifestation is a unique symbolic relic, blending digital art with the essence of fandom.
+            </p>
+            <p>
+              In this sector of the multiverse, we adhere to the strict doctrine of fictional representation. No literal human depictions are forged, 
+              preserving the artistic integrity and legal balance of our shared universe.
+            </p>
+            <div className="p-8 bg-neutral-950 border border-neutral-800 rounded-3xl">
+              <h4 className="text-[10px] font-black tracking-[0.4em] text-[#D4AF37] uppercase mb-4">Core Protocol</h4>
+              <p className="text-sm italic opacity-80">
+                "To celebrate is to forge; to forge is to remember. The legacy of the star belongs to those who carry their spirit into the digital age."
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -107,27 +168,16 @@ const App: React.FC = () => {
 
   const clearWatchdog = () => { if (watchdogRef.current) { window.clearTimeout(watchdogRef.current); watchdogRef.current = null; } };
   
-  /**
-   * resetForge: Instant state purge for creating a new tribute.
-   * Clears Vision (forgeOutput), Prompt (starNameInput), and resets session readiness.
-   */
   const resetForge = () => {
-    // 1. Clear output containers
     setGeneratedImages([]);
     setTimelineArtifact(null);
     setChatConcept(null);
-    
-    // 2. Clear prompt input field
     setPersistedPrompt("");
-    
-    // 3. Reset forge internal readiness
     setForgeState('DORMANT');
     setStatusMessage(null);
     setIsFailsafeActive(false);
     jobResolvedRef.current = false;
     clearWatchdog();
-    
-    // Visual feedback
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -195,9 +245,6 @@ const App: React.FC = () => {
     return null;
   };
 
-  /**
-   * beginFormation (startForge equivalent): Initiates the parallel manifestation process.
-   */
   const beginFormation = async (starInput: string, archetype: SubArchetypeFlavor) => {
     if (!canGenerate) {
       resolveJob('FAILED', FORGE_MESSAGES.QUOTA);
@@ -239,7 +286,6 @@ const App: React.FC = () => {
 
   const handleViewChange = (view: ViewType) => {
     if (view === 'home') {
-      // If user clicks Logo or Create Tribute while results are visible, trigger resetForge()
       if (activeView === 'home' && (forgeState === 'COMPLETED' || forgeState === 'FAILED')) {
         resetForge();
         return;
@@ -247,6 +293,72 @@ const App: React.FC = () => {
     }
     setActiveView(view); 
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
+  };
+
+  const renderActiveView = () => {
+    switch (activeView) {
+      case 'home':
+        return (
+          <div className="space-y-16">
+            <Hero selectedCategoryId={selectedCategoryId} onCategorySelect={(id) => { setSelectedCategoryId(id); if (forgeState === 'DORMANT') setForgeState('CONVENING'); }} />
+            <section id="forgeContainer" className="space-y-8">
+              <PromptGenerator onGenerate={beginFormation} forgeState={forgeState} tier={subState.tier} cooldown={subState.cooldownRemaining} canGenerate={canGenerate}
+                initialPrompt={persistedPrompt} initialArchetype={persistedArchetype} onPromptChange={setPersistedPrompt} onArchetypeChange={setPersistedArchetype}
+                onInputFocus={() => { if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') setForgeState('CONVENING'); }} />
+              <UsageTracker state={subState} forgeState={forgeState} onUpgradeClick={() => handleViewChange('pricing')} />
+            </section>
+
+            {forgeState === 'COMPLETED' && (
+              <div id="results-dashboard" className="space-y-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900/50 pb-10">
+                  <div className="space-y-6">
+                    <h3 className="text-4xl md:text-5xl font-cinzel font-bold tracking-[0.4em] uppercase filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]">
+                      <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.2)]">ICONIC</span> <span className="text-[#D4AF37] drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">VISION</span>
+                    </h3>
+                    <p className="text-neutral-500 font-cinzel text-[11px] tracking-[0.5em] uppercase opacity-90 leading-relaxed max-w-xl">
+                      DUAL-CHANNEL VISION & NEURAL SOCIAL LINK • PARALLEL MANIFESTATION
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end gap-4">
+                    <div className="flex items-center gap-3 text-[16px] font-black tracking-[0.6em] text-neutral-300 uppercase bg-neutral-950/90 px-8 py-4 rounded-xl border border-neutral-800/80 backdrop-blur-xl shadow-2xl">
+                      <ShieldAlert size={18} className="text-[#D4AF37]" />
+                      ICONIC <span className="text-[#D4AF37]">CHAT</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                  <div id="forgeOutput" className="lg:col-span-8">
+                    <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" hideHeader={true} />
+                  </div>
+                  <div className="lg:col-span-4 lg:sticky lg:top-32">
+                    <FanChat initialConcept={chatConcept} isSidebarMode={true} />
+                  </div>
+                </div>
+
+                <div className="w-full">
+                  <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      case 'trending':
+      case 'clubs-top':
+      case 'rankings':
+      case 'goat':
+        return <Gallery title={activeView === 'trending' ? "G.O.A.T" : activeView.replace('-', ' ').toUpperCase()} type="trending" />;
+      case 'community':
+      case 'tributes-new':
+      case 'tributes-legendary':
+        return <Gallery title={activeView === 'community' ? "Fan Book" : activeView.replace('-', ' ').toUpperCase()} type="community" />;
+      case 'fanchat':
+        return <FanChat initialConcept={chatConcept} />;
+      case 'pricing':
+        return <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />;
+      default:
+        return <InfoView viewType={activeView} />;
+    }
   };
 
   return (
@@ -263,60 +375,7 @@ const App: React.FC = () => {
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 relative z-10">
         {statusMessage && <ForgeStatusNotification onDismiss={() => setStatusMessage(null)} message={statusMessage} isFailed={forgeState === 'FAILED'} />}
         <div key={activeView} className="view-transition">
-          {activeView === 'home' ? (
-            <div className="space-y-16">
-              <Hero selectedCategoryId={selectedCategoryId} onCategorySelect={(id) => { setSelectedCategoryId(id); if (forgeState === 'DORMANT') setForgeState('CONVENING'); }} />
-              
-              <section id="forgeContainer" className="space-y-8">
-                <PromptGenerator onGenerate={beginFormation} forgeState={forgeState} tier={subState.tier} cooldown={subState.cooldownRemaining} canGenerate={canGenerate}
-                  initialPrompt={persistedPrompt} initialArchetype={persistedArchetype} onPromptChange={setPersistedPrompt} onArchetypeChange={setPersistedArchetype}
-                  onInputFocus={() => { if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') setForgeState('CONVENING'); }} />
-                <UsageTracker state={subState} forgeState={forgeState} onUpgradeClick={() => handleViewChange('pricing')} />
-              </section>
-
-              {forgeState === 'COMPLETED' && (
-                <div id="results-dashboard" className="space-y-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900/50 pb-10">
-                    <div className="space-y-6">
-                      <h3 className="text-4xl md:text-5xl font-cinzel font-bold tracking-[0.4em] uppercase filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]">
-                        <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.2)]">MANIFEST</span> <span className="text-[#D4AF37] drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">ARTIFACTS</span>
-                      </h3>
-                      <p className="text-neutral-500 font-cinzel text-[11px] tracking-[0.5em] uppercase opacity-90 leading-relaxed max-w-xl">
-                        DUAL-CHANNEL VISION & NEURAL SOCIAL LINK • PARALLEL MANIFESTATION
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-4">
-                      <div className="flex items-center gap-3 text-[9px] font-black tracking-[0.6em] text-neutral-300 uppercase bg-neutral-950/90 px-8 py-4 rounded-xl border border-neutral-800/80 backdrop-blur-xl shadow-2xl">
-                        <ShieldAlert size={14} className="text-[#D4AF37]" />
-                        AUTHENTICATED RESONANCE
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Dual-Channel Manifestation Dashboard */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                    <div id="forgeOutput" className="lg:col-span-8">
-                      <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" hideHeader={true} />
-                    </div>
-                    <div className="lg:col-span-4 lg:sticky lg:top-32">
-                      <FanChat initialConcept={chatConcept} isSidebarMode={true} />
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              {activeView === 'trending' && <Gallery title="G.O.A.T" type="trending" />}
-              {activeView === 'community' && <Gallery title="Fan Book" type="community" />}
-              {activeView === 'fanchat' && <FanChat initialConcept={chatConcept} />}
-              {activeView === 'pricing' && <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />}
-            </>
-          )}
+          {renderActiveView()}
         </div>
       </main>
       <Footer onViewChange={handleViewChange} />

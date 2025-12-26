@@ -21,7 +21,7 @@ const Hero: React.FC<Props> = ({ selectedCategoryId, onCategorySelect }) => {
             Forged For Future Fans
           </div>
           
-          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-cinzel font-bold leading-tight tracking-[0.1em] md:tracking-[0.15em] uppercase px-4">
+          <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-6xl font-cinzel font-bold leading-tight tracking-[0.1em] md:tracking-[0.15em] uppercase px-4">
             WRITE THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#D4AF37] bg-[length:200%_auto] animate-[shimmer_8s_linear_infinite]">MULTIVERSE</span>
           </h2>
           
