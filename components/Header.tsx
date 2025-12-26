@@ -7,7 +7,8 @@ export type ViewType =
   | 'home' | 'trending' | 'community' | 'fanchat' | 'pricing' 
   | 'about' | 'law' | 'goat' | 'how-it-works' | 'manifesto'
   | 'clubs-top' | 'tributes-new' | 'tributes-legendary' | 'rankings'
-  | 'levels' | 'terms' | 'privacy' | 'copyright' | 'rules' | 'report' | 'support';
+  | 'levels' | 'terms' | 'privacy' | 'copyright' | 'rules' | 'report' | 'support'
+  | 'fan-book' | 'fan-chat' | 'join';
 
 interface Props {
   tier?: UserTier;
@@ -87,7 +88,6 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
       <div className="max-w-[1600px] mx-auto px-4 lg:px-6">
         <div className="flex justify-between items-center h-24 py-4">
           
-          {/* Logo & Brand */}
           <div 
             id="brandLogo"
             className="flex items-center space-x-3 group cursor-pointer flex-shrink-0"
@@ -106,7 +106,6 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
             </div>
           </div>
           
-          {/* Central Navigation */}
           <nav className="hidden lg:flex space-x-8 xl:space-x-12 text-[10px] font-black tracking-[0.4em] flex-1 justify-center">
             {navItems.map((item) => (
               <button 
@@ -124,10 +123,8 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
             ))}
           </nav>
 
-          {/* Right Side Actions & Auth */}
           <div className="flex items-center space-x-4 xl:space-x-6 flex-shrink-0">
             
-            {/* UPGRADE */}
             <button 
               onClick={() => onViewChange('pricing')}
               onMouseEnter={() => setHoveredBtn('upgrade')}
@@ -141,7 +138,6 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
 
             <div className="h-4 w-[1px] bg-neutral-800 hidden xl:block" />
 
-            {/* LOGIN */}
             <button 
               onClick={() => onAuthClick('login')}
               className="hidden sm:flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-neutral-400 hover:text-white transition-colors uppercase"
@@ -149,7 +145,6 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
               <LogIn size={14} className="opacity-70" /> LOGIN
             </button>
 
-            {/* SIGN UP */}
             <button 
               onClick={() => onAuthClick('signup')}
               className="hidden sm:flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-neutral-400 hover:text-[#D4AF37] transition-colors uppercase"
@@ -157,7 +152,6 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
               <UserPlus size={14} className="opacity-70" /> SIGN UP
             </button>
 
-            {/* CREATE TRIBUTE */}
             <button 
               id="createTributeBtn"
               onClick={handleCreateClick}

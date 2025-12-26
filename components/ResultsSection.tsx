@@ -47,9 +47,9 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
             </p>
           </div>
           <div className="flex flex-col items-end gap-4">
-            <div className="flex items-center gap-3 text-[9px] font-black tracking-[0.6em] text-neutral-300 uppercase bg-neutral-950/90 px-8 py-4 rounded-xl border border-neutral-800/80 backdrop-blur-xl shadow-2xl">
-              <ShieldAlert size={14} className="text-[#D4AF37]" />
-              COLLECTIBLE-GRADE DOCTRINE
+            <div className="flex items-center gap-3 text-[16px] font-black tracking-[0.6em] text-neutral-300 uppercase bg-neutral-950/90 px-8 py-4 rounded-xl border border-neutral-800/80 backdrop-blur-xl shadow-2xl">
+              <ShieldAlert size={18} className="text-[#D4AF37]" />
+              ICONIC <span className="text-[#D4AF37]">CHAT</span>
             </div>
           </div>
         </div>

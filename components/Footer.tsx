@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Sparkles, Globe, Star, Shield, Users } from 'lucide-react';
+import { Globe, Star, Shield, Users } from 'lucide-react';
 import { ViewType } from './Header';
 
 interface Props {
@@ -59,7 +60,7 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
   const columns = [
     {
       title: 'THE UNIVERSE',
-      icon: <Globe size={14} className="text-[#D4AF37]" />,
+      icon: <Globe size={12} className="text-[#D4AF37]" />,
       links: [
         { label: 'About FanatiqAI', value: 'about' as ViewType },
         { label: 'Rewrite the Multiverse', value: 'law' as ViewType },
@@ -70,7 +71,7 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
     },
     {
       title: 'THE STARS',
-      icon: <Star size={14} className="text-[#D4AF37]" />,
+      icon: <Star size={12} className="text-[#D4AF37]" />,
       links: [
         { label: 'Trending G.O.A.Ts', value: 'trending' as ViewType },
         { label: 'Top Clubs', value: 'clubs-top' as ViewType },
@@ -81,18 +82,18 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
     },
     {
       title: 'THE FANS',
-      icon: <Users size={14} className="text-[#D4AF37]" />,
+      icon: <Users size={12} className="text-[#D4AF37]" />,
       links: [
         { label: 'Create a Tribute', value: 'home' as ViewType },
-        { label: 'Fan Book', value: 'community' as ViewType },
-        { label: 'Fan Chat', value: 'fanchat' as ViewType },
-        { label: 'Become a Fanatiq', value: 'pricing' as ViewType },
+        { label: 'Fan Book', value: 'fan-book' as ViewType },
+        { label: 'Fan Chat', value: 'fan-chat' as ViewType },
+        { label: 'Become a Fanatiq', value: 'join' as ViewType },
         { label: 'Creator Levels & Badges', value: 'levels' as ViewType },
       ],
     },
     {
       title: 'THE LAW',
-      icon: <Shield size={14} className="text-[#D4AF37]" />,
+      icon: <Shield size={12} className="text-[#D4AF37]" />,
       links: [
         { label: 'Terms of Service', value: 'terms' as ViewType },
         { label: 'Privacy Policy', value: 'privacy' as ViewType },
@@ -105,50 +106,47 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
   ];
 
   return (
-    <footer className="w-full bg-[#050505] pt-32 pb-16 px-6 relative overflow-hidden border-t border-[#D4AF37]/10">
-      {/* Cosmic Nebula Background Effect */}
+    <footer className="w-full bg-[#050505] pt-24 pb-16 px-6 relative overflow-hidden border-t border-[#D4AF37]/10">
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-[#D4AF37]/5 blur-[160px] rounded-full -z-10 pointer-events-none opacity-40" />
       
       <div className="max-w-[1600px] mx-auto relative z-10">
-        {/* Brand Header Mark */}
-        <div className="mb-24 flex flex-col items-center text-center">
+        <div className="mb-16 flex flex-col items-center text-center">
           <div 
-            className="mb-8 cursor-pointer transition-transform duration-700 hover:scale-110" 
+            className="mb-6 cursor-pointer transition-transform duration-700 hover:scale-110" 
             onClick={() => onViewChange?.('home')}
           >
-            <DigitalOscarLogo className="w-20 h-20" />
+            <DigitalOscarLogo className="w-12 h-12" />
           </div>
-          <h2 className="text-[#D4AF37] font-cinzel font-bold text-3xl tracking-[0.5em] uppercase mb-4 cursor-pointer" onClick={() => onViewChange?.('home')}>
+          <h2 className="text-[#D4AF37] font-cinzel font-bold text-lg md:text-xl tracking-[0.5em] uppercase mb-4 cursor-pointer" onClick={() => onViewChange?.('home')}>
             FANATIQ<span className="text-white">AI</span>
           </h2>
-          <div className="h-[1px] w-24 bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent" />
+          <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent" />
         </div>
 
-        {/* Universe Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-8 mb-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-24">
           {columns.map((col, idx) => (
-            <div key={idx} className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${idx * 150}ms` }}>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
+            <div key={idx} className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${idx * 150}ms` }}>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2.5">
                   {col.icon}
-                  <h4 className="text-[11px] font-black tracking-[0.4em] text-[#D4AF37] uppercase font-cinzel">
+                  <h4 className="text-[9px] font-black tracking-[0.4em] text-[#D4AF37] uppercase font-cinzel">
                     {col.title}
                   </h4>
                 </div>
                 <div className="relative w-full h-[1px] bg-neutral-900 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/40 to-transparent w-full" />
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-1 bg-[#D4AF37] rounded-full shadow-[0_0_10px_#D4AF37] animate-pulse" />
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-0.5 h-0.5 bg-[#D4AF37] rounded-full shadow-[0_0_10px_#D4AF37] animate-pulse" />
                 </div>
               </div>
 
-              <nav className="flex flex-col gap-5">
+              <nav className="flex flex-col gap-4">
                 {col.links.map((link, lIdx) => (
                   <button
                     key={lIdx}
                     onClick={() => onViewChange?.(link.value)}
-                    className="group flex items-center gap-3 text-[10px] font-bold tracking-[0.2em] text-neutral-500 hover:text-white transition-all duration-300 uppercase text-left w-fit"
+                    className="group flex items-center gap-2 text-[9px] font-bold tracking-[0.2em] text-neutral-500 hover:text-white transition-all duration-300 uppercase text-left w-fit"
                   >
-                    <div className="w-0 h-[1px] bg-[#D4AF37] group-hover:w-4 transition-all duration-500" />
+                    <div className="w-0 h-[1px] bg-[#D4AF37] group-hover:w-3 transition-all duration-500" />
                     <span className="group-hover:translate-x-1 transition-transform duration-500">{link.label}</span>
                   </button>
                 ))}
@@ -157,41 +155,39 @@ const Footer: React.FC<Props> = ({ onViewChange }) => {
           ))}
         </div>
 
-        {/* Brand Law Strip */}
-        <div className="pt-16 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex flex-col items-center md:items-start gap-2">
+        <div className="pt-12 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col items-center md:items-start gap-1.5">
             <p 
-              className="text-[10px] text-white/40 font-black tracking-[0.5em] uppercase cursor-pointer hover:text-white transition-colors"
+              className="text-[8px] text-white/40 font-black tracking-[0.5em] uppercase cursor-pointer hover:text-white transition-colors"
               onClick={() => onViewChange?.('law')}
             >
               © FANATIQAI — REWRITE THE MULTIVERSE
             </p>
             <p 
-              className="text-[8px] text-[#D4AF37]/60 font-black tracking-[0.3em] uppercase cursor-pointer hover:text-[#D4AF37] transition-colors"
+              className="text-[7px] text-[#D4AF37]/60 font-black tracking-[0.3em] uppercase cursor-pointer hover:text-[#D4AF37] transition-colors"
               onClick={() => onViewChange?.('copyright')}
             >
               All Tributes Belong to Their Fans.
             </p>
           </div>
           
-          <div className="flex items-center gap-10">
-            <div className="flex gap-6">
+          <div className="flex items-center gap-8">
+            <div className="flex gap-5">
               {['Discord', 'X', 'Legacy'].map((social) => (
-                <button key={social} className="text-[9px] font-black tracking-widest text-neutral-600 hover:text-[#D4AF37] transition-colors uppercase">
+                <button key={social} className="text-[8px] font-black tracking-widest text-neutral-600 hover:text-[#D4AF37] transition-colors uppercase">
                   {social}
                 </button>
               ))}
             </div>
-            <div className="h-8 w-[1px] bg-neutral-900 hidden md:block" />
-            <div className="flex items-center gap-3 text-[9px] font-black tracking-[0.4em] text-neutral-600 uppercase">
-              <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
+            <div className="h-6 w-[1px] bg-neutral-900 hidden md:block" />
+            <div className="flex items-center gap-2 text-[8px] font-black tracking-[0.4em] text-neutral-600 uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
               Core Synchronized
             </div>
           </div>
         </div>
       </div>
       
-      {/* Aesthetic Grain overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/granite.png')] mix-blend-overlay"></div>
     </footer>
   );
