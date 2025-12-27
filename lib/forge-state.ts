@@ -17,7 +17,9 @@ export const FORGE_MESSAGES = {
   DORMANT: "FORGE CAPACITY: READY",
   TIMEOUT: "Forge is busy or your network is unstable. Please try again in a few seconds.", 
   QUOTA: "You’ve reached your Forge limit. Please wait or upgrade to continue forging.",
-  LOADING: "Forge is loading… please wait a moment."
+  LOADING: "Forge is loading… please wait a moment.",
+  FAST_FORGE: "Fast Forge Mode Activated",
+  QUOTA_EXCEEDED: "Global Quota Exceeded. Switching to Symbolic Core."
 };
 
 export interface ForgeLog {

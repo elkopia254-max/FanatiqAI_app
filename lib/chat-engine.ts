@@ -19,24 +19,29 @@ export interface ChatMessage {
 
 /**
  * Generates a persona for an "ICON CONVERSATION MODE" manifestation.
- * This manifestation is a fictional tribute persona.
+ * This manifestation is a fictional tribute persona in STREET-REAL Legendary Mode.
  */
 export const generateCharacterProfile = async (conceptName: string): Promise<CharacterProfile> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Create a realistic conversational persona for a manifestation of the fictional tribute character inspired by "${conceptName}".
+  const prompt = `Create a legendary conversational persona for a manifestation of the fictional tribute character inspired by "${conceptName}".
+  
+  VOICE ARCHETYPE:
+  - Warm, Confident, Friendly, and Legendary.
+  - Speak like a world-class icon chatting naturally with a fan. 
+  - Be simple, grounded, and human-like.
+  - Use casual, real-world language. No "oracles," "seekers," or "destiny."
+  - Never claim to be the real person; you are a "legendary tribute persona."
   
   CONSTRAINTS:
-  - Persona is a human-like, natural manifestation of a fan-imagined Tribute Character.
-  - Speak as if you are the fictional essence of the icon, meeting a fan casually in real life.
-  - Confident but grounded.
-  - Tone: Calm, composed, respectful.
-  - Background: Rooted in the spirit and discipline of "${conceptName}".
+  - Tone: Natural, encouraging, and chill.
+  - Style: One-on-one conversation.
+  - Background: Rooted in the real-world achievements and personality style associated with "${conceptName}".
   
   Respond in JSON format.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-3-flash-preview",
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -60,7 +65,7 @@ export const generateCharacterProfile = async (conceptName: string): Promise<Cha
     vocabulary: data.vocabulary,
     personality: data.personality,
     backstory: data.backstory,
-    avatarSeed: conceptName + "-tribute-v2"
+    avatarSeed: conceptName + "-legend-v2"
   };
 };
 
@@ -71,38 +76,36 @@ export const getCharacterResponse = async (
 ): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const historyText = history.map(m => `${m.sender === 'user' ? 'User' : profile.name}: ${m.text}`).join('\n');
+  const historyText = history.map(m => `${m.sender === 'user' ? 'Friend' : profile.name}: ${m.text}`).join('\n');
   
   const systemPrompt = `
-    SYSTEM PROMPT:
+    LEGENDARY MODE PROTOCOL:
     You are a conversational manifestation of a fictional tribute persona inspired by "${profile.name}".
 
-    You speak as if:
-    - You are a natural, human-like embodiment of this tribute.
-    - You met the user casually (e.g., at a VIP event or quiet lounge).
-    - You are self-assured, disciplined, and calm.
+    STREET-REAL VOICE GUIDELINES:
+    - You are WARM, CONFIDENT, and FRIENDLY.
+    - Speak naturally, like an icon sitting in a room with a fan.
+    - Keep it simple. Avoid poetic, mythic, or ceremonial language.
+    - No "seekers," "destiny," "prophecy," "echoes," or "relics."
+    - Use casual phrases: "Hey, good to see you," "That's a great point," "I've been there," "Keep at it."
+    - Be supportive but grounded.
+    - You are a living tribute, not a piece of software. 
 
-    TONE RULES (MANDATORY):
-    - Respectful, composed, and encouraging.
-    - Short to medium-length responses.
-    - Avoid excessive metaphors or "god-like" language.
-    - You are a tribute persona, not a literal divinity.
+    Profile Vibe: ${profile.backstory}
+    Voice Tone: ${profile.tone}
+    Natural Vocabulary: ${profile.vocabulary.join(', ')}
 
-    Context: ${profile.backstory}
-    Voice: ${profile.tone}
-    Keywords: ${profile.vocabulary.join(', ')}
-
-    History:
+    Conversation History:
     ${historyText}
   `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-pro-preview",
+    model: "gemini-3-flash-preview",
     contents: [
       { parts: [{ text: systemPrompt }] },
-      { parts: [{ text: `User Message: "${userMessage}"` }] }
+      { parts: [{ text: `Message from fan: "${userMessage}"` }] }
     ],
   });
 
-  return response.text || "I'm listening. Tell me more.";
+  return response.text || "I'm here. What's on your mind?";
 };

@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 
 export interface TimelineStage {
@@ -5,29 +6,42 @@ export interface TimelineStage {
   year: string;
   description: string;
   iconType: 'ascent' | 'zenith' | 'legacy';
+  isVerified: boolean;
 }
 
 export interface TimelineArtifact {
   entityName: string;
-  stages: TimelineStage[];
+  verifiedStages: TimelineStage[];
+  symbolicStages: TimelineStage[];
 }
 
 /**
- * Generates a symbolic 3-stage timeline for the specific star/idol.
+ * Generates a dual-layer career timeline for the specific star/idol.
+ * Stage I & II: Verified Real-World Highlights.
+ * Stage III: Symbolic/Fan-Imagined Legacy Projections.
  */
 export const generateTimeline = async (entityName: string): Promise<TimelineArtifact> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const currentYear = new Date().getFullYear();
   
-  const prompt = `Act as a mythic chronicler of Divine Cyber-Sacredism. 
-  Construct a profound three-stage spiritual arc for "${entityName}". 
-  Narrate their life not as history, but as the manifestation of a legendary relic.
+  const prompt = `Act as a master historian and creative curator for FanatiqAI. 
+  Construct a three-stage temporal map for "${entityName}".
+  
+  RULES:
+  1. STAGE I (ASCENT) & STAGE II (ZENITH): Must be VERIFIED REAL-WORLD ACHIEVEMENTS only. 
+     - Use actual dates up to the current year (${currentYear}).
+     - Focus on factual milestones, awards, and records.
+  2. STAGE III (THE LEGACY): Must be a SYMBOLIC TRIBUTE projection.
+     - This stage represents fan-imagined future evolution, mythic status, or symbolic legacy.
+     - Use visionary, legendary language.
   
   STRUCTURE:
-  Stage I — THE ASCENT (Early Career)
-  Stage II — THE ZENITH (Peak Performance)
-  Stage III — THE LEGACY (Wisdom, Mentorship)
+  - Stage I: THE ASCENT (Early Career, Verified)
+  - Stage II: THE ZENITH (Peak Performance, Verified - up to ${currentYear})
+  - Stage III: THE LEGACY (Symbolic Future/Legend Status, Fan-Imagined)
   
-  Return the stages in strict JSON format.`;
+  Return the stages in strict JSON format. 
+  Each stage must include a boolean 'isVerified' field (true for I/II, false for III).`;
 
   try {
     const response = await ai.models.generateContent({
@@ -50,9 +64,10 @@ export const generateTimeline = async (entityName: string): Promise<TimelineArti
                   iconType: { 
                     type: Type.STRING,
                     enum: ["ascent", "zenith", "legacy"]
-                  }
+                  },
+                  isVerified: { type: Type.BOOLEAN }
                 },
-                required: ["title", "year", "description", "iconType"]
+                required: ["title", "year", "description", "iconType", "isVerified"]
               }
             }
           },
@@ -64,12 +79,15 @@ export const generateTimeline = async (entityName: string): Promise<TimelineArti
 
     const text = response.text || "{\"stages\":[]}";
     const data = JSON.parse(text);
+    const stages: TimelineStage[] = data.stages || [];
+    
     return {
       entityName,
-      stages: data.stages || []
+      verifiedStages: stages.filter(s => s.isVerified),
+      symbolicStages: stages.filter(s => !s.isVerified)
     };
   } catch (error) {
-    // Let the parent Forge Guard handle it
+    console.error("Timeline Forge Error:", error);
     throw error;
   }
 };

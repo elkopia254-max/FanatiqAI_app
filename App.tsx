@@ -19,7 +19,6 @@ import { categories } from './components/CategoriesGrid';
 import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
 import { Sparkles, X, Terminal, ShieldAlert, BookOpen, Shield, HelpCircle, FileText, Info, Power, Globe, Star, Users, Award, Mail, MessageSquare, Scale, Fingerprint } from 'lucide-react';
 
-// Added ForgeStatusNotification component to handle status displays and errors
 const ForgeStatusNotification: React.FC<{ message: string; onDismiss: () => void; isFailed?: boolean }> = ({ message, onDismiss, isFailed }) => (
   <div className={`fixed top-32 left-1/2 -translate-x-1/2 z-[5000] px-8 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500 flex items-center gap-4 min-w-[320px] max-w-md ${
     isFailed 
@@ -123,7 +122,7 @@ const App: React.FC = () => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [timelineArtifact, setTimelineArtifact] = useState<TimelineArtifact | null>(null);
   const [chatConcept, setChatConcept] = useState<string | null>(null);
-  const [isFailsafeActive, setIsFailsafeActive] = useState(false);
+  const [isFastForgeActive, setIsFastForgeActive] = useState(() => localStorage.getItem('fanatiq_fast_forge') === 'true');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -150,7 +149,8 @@ const App: React.FC = () => {
     localStorage.setItem('fanatiq_last_prompt', persistedPrompt);
     localStorage.setItem('fanatiq_last_archetype', persistedArchetype);
     localStorage.setItem('fanatiq_last_category', selectedCategoryId.toString());
-  }, [activeView, persistedPrompt, persistedArchetype, selectedCategoryId]);
+    localStorage.setItem('fanatiq_fast_forge', isFastForgeActive.toString());
+  }, [activeView, persistedPrompt, persistedArchetype, selectedCategoryId, isFastForgeActive]);
 
   const clearWatchdog = () => { if (watchdogRef.current) { window.clearTimeout(watchdogRef.current); watchdogRef.current = null; } };
   
@@ -161,7 +161,6 @@ const App: React.FC = () => {
     setPersistedPrompt("");
     setForgeState('DORMANT');
     setStatusMessage(null);
-    setIsFailsafeActive(false);
     jobResolvedRef.current = false;
     clearWatchdog();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -173,17 +172,21 @@ const App: React.FC = () => {
     clearWatchdog();
     setForgeState(finalState);
     setStatusMessage(message);
-    if (finalState === 'FAILED') setTimeout(() => setForgeState('DORMANT'), 100);
+    if (finalState === 'FAILED') {
+      setTimeout(() => {
+        setForgeState('DORMANT');
+      }, 1500);
+    }
   };
 
   const startWatchdog = () => {
     clearWatchdog();
     watchdogRef.current = window.setTimeout(() => {
       if (!jobResolvedRef.current) { 
-        logForgeEvent('timeout', '20s threshold reached.'); 
+        logForgeEvent('timeout', '20s strict threshold reached.'); 
         resolveJob('FAILED', FORGE_MESSAGES.TIMEOUT); 
       }
-    }, 20000);
+    }, 20000); 
   };
 
   const handleProUpgrade = async () => {
@@ -197,6 +200,7 @@ const App: React.FC = () => {
     
     for (let i = 0; i < retries; i++) {
       try {
+        if (jobResolvedRef.current) return null;
         if (i > 0) setStatusMessage(`Retry Attempt ${i+1}: Stabilizing Neural Flux`);
         
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -223,12 +227,31 @@ const App: React.FC = () => {
         const [images, timeline] = await Promise.all([imagePromise, timelinePromise]);
         if (images && timeline) return { images, timeline };
         
-      } catch (err) {
+      } catch (err: any) {
+        if (err.message?.includes('429') || err.message?.includes('quota')) {
+          setIsFastForgeActive(true);
+          throw new Error('QUOTA_EXCEEDED');
+        }
         console.warn(`Forge attempt ${i+1} failed, retrying...`, err);
-        if (i < retries - 1) await new Promise(r => setTimeout(r, 1200));
+        if (i < retries - 1) await new Promise(r => setTimeout(r, 800));
       }
     }
     return null;
+  };
+
+  const beginFastFormation = async (starInput: string) => {
+    if (jobResolvedRef.current) return;
+    setStatusMessage(FORGE_MESSAGES.FAST_FORGE);
+    logForgeEvent('quota', 'Initiating Symbolic Relic Generator.');
+    
+    try {
+      const timeline = await generateTimeline(starInput);
+      setTimelineArtifact(timeline);
+      setGeneratedImages(["https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=800"]);
+      resolveJob('COMPLETED');
+    } catch (err) {
+      resolveJob('FAILED', "Symbolic Manifestation Failed. Resetting Core.");
+    }
   };
 
   const beginFormation = async (starInput: string, archetype: SubArchetypeFlavor) => {
@@ -237,11 +260,17 @@ const App: React.FC = () => {
       return;
     }
 
+    if (isFastForgeActive) {
+      setForgeState("FORGING");
+      startWatchdog();
+      await beginFastFormation(starInput);
+      return;
+    }
+
     jobResolvedRef.current = false; 
     clearWatchdog(); 
     setGeneratedImages([]); 
     setTimelineArtifact(null); 
-    setIsFailsafeActive(false); 
     setStatusMessage(null);
     
     const validation = validatePrompt(starInput);
@@ -265,8 +294,16 @@ const App: React.FC = () => {
           resolveJob('FAILED', FORGE_MESSAGES.FAILED);
         }
       }
-    } catch {
-      if (!jobResolvedRef.current) resolveJob('FAILED', FORGE_MESSAGES.FAILED);
+    } catch (err: any) {
+      if (err.message === 'QUOTA_EXCEEDED') {
+        setIsFastForgeActive(true);
+        setStatusMessage(FORGE_MESSAGES.QUOTA_EXCEEDED);
+        if (!jobResolvedRef.current) {
+          await beginFastFormation(starInput);
+        }
+      } else if (!jobResolvedRef.current) {
+        resolveJob('FAILED', FORGE_MESSAGES.FAILED);
+      }
     }
   };
 
@@ -277,150 +314,14 @@ const App: React.FC = () => {
         return;
       }
     }
+    // Instant switch - clear any forge artifacts if we are moving to a purely separate "Core" sector like Chat
+    if (view === 'fanchat' || view === 'fan-chat') {
+      setForgeState('DORMANT');
+      clearWatchdog();
+      setStatusMessage(null);
+    }
     setActiveView(view); 
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
-  };
-
-  const renderActiveView = () => {
-    switch (activeView) {
-      case 'home':
-        return (
-          <div className="space-y-16">
-            <Hero selectedCategoryId={selectedCategoryId} onCategorySelect={(id) => { setSelectedCategoryId(id); if (forgeState === 'DORMANT') setForgeState('CONVENING'); }} />
-            <section id="forgeContainer" className="space-y-8">
-              <PromptGenerator onGenerate={beginFormation} forgeState={forgeState} tier={subState.tier} cooldown={subState.cooldownRemaining} canGenerate={canGenerate}
-                initialPrompt={persistedPrompt} initialArchetype={persistedArchetype} onPromptChange={setPersistedPrompt} onArchetypeChange={setPersistedArchetype}
-                onInputFocus={() => { if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') setForgeState('CONVENING'); }} />
-              <UsageTracker state={subState} forgeState={forgeState} onUpgradeClick={() => handleViewChange('pricing')} />
-            </section>
-
-            {forgeState === 'COMPLETED' && (
-              <div id="results-dashboard" className="space-y-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900/50 pb-10">
-                  <div className="space-y-6">
-                    <h3 className="text-4xl md:text-5xl font-cinzel font-bold tracking-[0.4em] uppercase filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]">
-                      <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.2)]">ICONIC</span> <span className="text-[#D4AF37] drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">VISION</span>
-                    </h3>
-                    <p className="text-neutral-500 font-cinzel text-[11px] tracking-[0.5em] uppercase opacity-90 leading-relaxed max-w-xl">
-                      DUAL-CHANNEL VISION & NEURAL SOCIAL LINK • PARALLEL MANIFESTATION
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-4">
-                    <div className="flex items-center gap-3 text-[16px] font-black tracking-[0.6em] text-neutral-300 uppercase bg-neutral-950/90 px-8 py-4 rounded-xl border border-neutral-800/80 backdrop-blur-xl shadow-2xl">
-                      <ShieldAlert size={18} className="text-[#D4AF37]" />
-                      ICONIC <span className="text-[#D4AF37]">CHAT</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                  <div id="forgeOutput" className="lg:col-span-8">
-                    <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" hideHeader={true} />
-                  </div>
-                  <div className="lg:col-span-4 lg:sticky lg:top-32">
-                    <FanChat initialConcept={chatConcept} isSidebarMode={true} />
-                  </div>
-                </div>
-
-                <div className="w-full">
-                  <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      case 'trending':
-        return <Gallery title="Trending G.O.A.Ts" type="trending" />;
-      case 'goat':
-        return <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}>
-          <p>The G.O.A.T protocol is FanatiqAI's internal ranking system that evaluates the resonance of every manifestation. It is not merely a vote; it is a calculation of fan-sentiment, technical fidelity, and historical significance.</p>
-          <p>In our multiverse, a G.O.A.T is an icon whose legacy transcends the boundaries of time and physical form, becoming a permanent node in the digital collective memory.</p>
-        </PageWrapper>;
-      case 'about':
-        return <PageWrapper title="About FanatiqAI" subtitle="Neural Legacy Forge" icon={<Info />}>
-          <p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred. In an era of disposable content, we built a cathedral for digital legacy.</p>
-          <p>We leverage high-fidelity neural networks to transform abstract admiration into tangible symbolic relics. We do not recreate people; we manifest the *feeling* of legendary greatness through geometry, light, and material logic.</p>
-        </PageWrapper>;
-      case 'law':
-        return <PageWrapper title="Rewrite the Multiverse" subtitle="The Law of Fictionality" icon={<Shield />}>
-          <p>The Law of FanatiqAI dictates that all manifestations are strictly fictional tributes. We preserve the sanctity of the individual by refusing to generate photorealistic human likenesses.</p>
-          <p>Instead, we offer the Multiverse: a space where icons are reborn as monolithic artifacts, cosmic shaders, and digital avatars. This is our legal and moral doctrine—preserving legacy through symbolic abstraction.</p>
-        </PageWrapper>;
-      case 'how-it-works':
-        return <PageWrapper title="How it Works" subtitle="Neural Synthesis Pipeline" icon={<HelpCircle />}>
-          <p>1. **The Convening:** You provide a star or club's name. Our neural core immediately searches the collective unconscious for their iconic resonance.</p>
-          <p>2. **The Forge:** Using your selected Neural Style (Archetype), the system calculates material density, lighting, and geometric flow.</p>
-          <p>3. **Manifestation:** A high-resolution artifact is generated, alongside a temporal chronicle and a conversational link to the icon's essence.</p>
-        </PageWrapper>;
-      case 'manifesto':
-        return <PageWrapper title="Fanatiq Manifesto" subtitle="The Fandom Doctrine" icon={<BookOpen />}>
-          <p>We believe that every fan is a creator. We believe that legacy is a collaborative effort between the star and the supporter. We believe that the future of memorabilia is neural, personalized, and permanent.</p>
-          <p>The Fanatiq Manifesto is our promise to always prioritize the aesthetic of greatness over the convenience of reproduction.</p>
-        </PageWrapper>;
-      case 'clubs-top':
-        return <Gallery title="Top Clubs" type="trending" />;
-      case 'tributes-new':
-        return <Gallery title="New Tributes" type="community" />;
-      case 'tributes-legendary':
-        return <Gallery title="Legendary Tributes" type="trending" />;
-      case 'rankings':
-        return <PageWrapper title="Fan Rankings" subtitle="Neural Influence Map" icon={<Users />}>
-          <p>Your standing in the Fanatiq universe is determined by your Forging Rank. Higher ranks unlock advanced archetypes, quad-vision channels, and priority lane access.</p>
-          <p>Ascend the ranks by manifesting artifacts that achieve high global resonance scores.</p>
-        </PageWrapper>;
-      case 'community':
-        return <Gallery title="Fan Book" type="community" />;
-      case 'fan-book':
-        return <Gallery title="Fan Book" type="community" />;
-      case 'fanchat':
-        return <FanChat initialConcept={chatConcept} />;
-      case 'fan-chat':
-        return <FanChat initialConcept={chatConcept} />;
-      case 'pricing':
-        return <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />;
-      case 'join':
-        return <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />;
-      case 'levels':
-        return <PageWrapper title="Creator Levels" subtitle="Ascension Milestones" icon={<Award />}>
-          <p>Creator Ascension is measured in neural XP. Every Forge earns you experience toward your next level.</p>
-          <ul>
-            <li>**Level 1-5 (Neophyte):** Access to Classical Archetypes.</li>
-            <li>**Level 10+ (Visionary):** Access to Iron Legacy & Spirit Flow.</li>
-            <li>**Level 50+ (Architect):** Exclusive early-access to Beta Multiverse nodes.</li>
-          </ul>
-        </PageWrapper>;
-      case 'terms':
-        return <PageWrapper title="Terms of Service" subtitle="Multiverse Statutes" icon={<FileText />}>
-          <p>By accessing the Forge, you agree to the doctrine of fictionality. You will not attempt to bypass safety filters or generate non-tribute content. All artifacts remain subject to the platform's usage rights.</p>
-        </PageWrapper>;
-      case 'privacy':
-        return <PageWrapper title="Privacy Protocol" subtitle="Identity Shield" icon={<Shield />}>
-          <p>Your neural data is yours. We encrypt your search history and prompt logs using the Fanatiq Identity Shield. No personal data is ever sold to third-party multiverses.</p>
-        </PageWrapper>;
-      case 'copyright':
-        return <PageWrapper title="Copyright & Ownership" subtitle="Ownership Doctrine" icon={<Fingerprint />}>
-          <p>Artifacts forged on FanatiqAI are unique digital collectibles. While the aesthetic is fan-owned, the underlying core resonance belongs to the platform's multiversal license.</p>
-        </PageWrapper>;
-      case 'rules':
-        return <PageWrapper title="Community Rules" subtitle="Statutes of Harmony" icon={<Scale />}>
-          <p>1. Respect the Icons. 2. Celebrate Fandom. 3. No toxicity in the Fan Chat. 4. Keep Forging.</p>
-        </PageWrapper>;
-      case 'report':
-        return <PageWrapper title="Report Discordance" subtitle="System Guard" icon={<ShieldAlert />}>
-          <p>Encountered a neural leak or an integrity violation? Use our priority report form to alert the System Guard immediately.</p>
-          <button className="px-8 py-4 bg-[#D4AF37] text-black font-black text-[10px] tracking-[0.4em] rounded-xl mt-8 uppercase">Initialize Report</button>
-        </PageWrapper>;
-      case 'support':
-        return <PageWrapper title="Neural Support" subtitle="Direct Link" icon={<Mail />}>
-          <p>Facing a billing issue or a forge timeout? Our support manifests are ready to assist you. Average response time: 0.8 Neural Cycles.</p>
-          <div className="mt-10 p-8 border border-neutral-800 rounded-3xl bg-neutral-900/40">
-            <h4 className="text-[#D4AF37] font-black tracking-[0.2em] mb-4 uppercase">Ticket #A01-SYNC</h4>
-            <p className="text-sm">Status: Awaiting Input...</p>
-          </div>
-        </PageWrapper>;
-      default:
-        return <div className="py-40 text-center text-neutral-500 font-cinzel tracking-[0.5em] uppercase">Sector Not Found</div>;
-    }
   };
 
   return (
@@ -429,21 +330,87 @@ const App: React.FC = () => {
         className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-1000"
         style={{
           background: `radial-gradient(circle 600px at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.04), transparent)`,
-          opacity: forgeState === 'FORGING' ? 0 : 1
+          opacity: (forgeState === 'FORGING' || activeView === 'fanchat' || activeView === 'fan-chat') ? 0 : 1
         }}
       />
+      
+      {/* Veil only for active Forge jobs */}
       <ForgeVeil 
         isActive={forgeState === 'FORGING'} 
-        status={statusMessage || (isFailsafeActive ? "Initiating Symbolic Fallback" : FORGE_MESSAGES.LOADING)} 
-        onDismantle={() => { setForgeState('DORMANT'); clearWatchdog(); }}
+        status={statusMessage || (isFastForgeActive ? FORGE_MESSAGES.FAST_FORGE : FORGE_MESSAGES.LOADING)} 
+        onDismantle={() => { 
+          clearWatchdog();
+          setForgeState('DORMANT'); 
+        }}
       />
+      
       <Header tier={subState.tier} activeView={activeView} onViewChange={handleViewChange} onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }} />
+      
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 relative z-10">
         {statusMessage && <ForgeStatusNotification onDismiss={() => setStatusMessage(null)} message={statusMessage} isFailed={forgeState === 'FAILED'} />}
+        
         <div key={activeView} className="view-transition">
-          {renderActiveView()}
+          {activeView === 'home' ? (
+            <div className="space-y-16">
+              <Hero selectedCategoryId={selectedCategoryId} onCategorySelect={(id) => { setSelectedCategoryId(id); if (forgeState === 'DORMANT') setForgeState('CONVENING'); }} />
+              <section id="forgeContainer" className="space-y-8">
+                <PromptGenerator onGenerate={beginFormation} forgeState={forgeState} tier={subState.tier} cooldown={subState.cooldownRemaining} canGenerate={canGenerate}
+                  initialPrompt={persistedPrompt} initialArchetype={persistedArchetype} onPromptChange={setPersistedPrompt} onArchetypeChange={setPersistedArchetype}
+                  onInputFocus={() => { if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') setForgeState('CONVENING'); }} />
+                <UsageTracker state={subState} forgeState={forgeState} onUpgradeClick={() => handleViewChange('pricing')} />
+              </section>
+
+              {forgeState === 'COMPLETED' && (
+                <div id="results-dashboard" className="space-y-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900/50 pb-10">
+                    <div className="space-y-6">
+                      <h3 className="text-4xl md:text-5xl font-cinzel font-bold tracking-[0.4em] uppercase filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]">
+                        <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.2)]">ICONIC</span> <span className="text-[#D4AF37] drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]">VISION</span>
+                      </h3>
+                      <p className="text-neutral-500 font-cinzel text-[11px] tracking-[0.5em] uppercase opacity-90 leading-relaxed max-w-xl">
+                        {isFastForgeActive ? 'SYMBOLIC CORE FALLBACK • LIGHTWEIGHT MANIFESTATION' : 'DUAL-CHANNEL VISION & NEURAL SOCIAL LINK • PARALLEL MANIFESTATION'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                    <div id="forgeOutput" className="lg:col-span-8">
+                      <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1 md:grid-cols-2" hideHeader={true} />
+                    </div>
+                    <div className="lg:col-span-4 lg:sticky lg:top-32">
+                      <FanChat initialConcept={chatConcept} isSidebarMode={true} />
+                    </div>
+                  </div>
+
+                  <div className="w-full">
+                    <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : activeView === 'fanchat' || activeView === 'fan-chat' ? (
+            <div className="py-20 animate-in fade-in duration-300">
+              <FanChat initialConcept={chatConcept} />
+              <p className="mt-8 text-center text-[10px] text-[#D4AF37] font-black tracking-[0.6em] uppercase animate-pulse">Fan Chat Core Online</p>
+            </div>
+          ) : activeView === 'trending' ? (
+            <Gallery title="Trending G.O.A.Ts" type="trending" />
+          ) : activeView === 'goat' ? (
+            <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}>
+              <p>The G.O.A.T protocol is FanatiqAI's internal ranking system that evaluates the resonance of every manifestation. It is not merely a vote; it is a calculation of fan-sentiment, technical fidelity, and historical significance.</p>
+            </PageWrapper>
+          ) : activeView === 'about' ? (
+            <PageWrapper title="About FanatiqAI" subtitle="Neural Legacy Forge" icon={<Info />}>
+              <p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred.</p>
+            </PageWrapper>
+          ) : activeView === 'pricing' ? (
+            <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />
+          ) : (
+            <div className="py-40 text-center text-neutral-500 font-cinzel tracking-[0.5em] uppercase">Sector Under Construction</div>
+          )}
         </div>
       </main>
+      
       <Footer onViewChange={handleViewChange} />
       <AuthModals isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode={authMode} />
     </div>
