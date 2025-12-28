@@ -1,15 +1,17 @@
 
 import React, { useState } from 'react';
 import { X, Copy, Check, Download, Send, Twitter, Facebook, Instagram, Mail, MessageSquare, Share as ShareIcon, Youtube, Music2 } from 'lucide-react';
+import { galleryStore } from '../lib/gallery-store';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   image: string;
   starName: string;
+  artifactId?: string; // Optional: Link share to specific artifact in store
 }
 
-const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
+const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName, artifactId }) => {
   const [copied, setCopied] = useState(false);
   
   // Create a unique shareable link
@@ -18,10 +20,17 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
   // User Requested Universal Share Text
   const SHARE_TEXT = `I just forged a FanatiqAI artifact ✨ `;
 
+  const trackShare = () => {
+    if (artifactId) {
+      galleryStore.incrementMetric(artifactId, 'shares');
+    }
+  };
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(`${SHARE_TEXT}${shareUrl}`);
       setCopied(true);
+      trackShare();
       setTimeout(() => setCopied(false), 2000);
       return true;
     } catch (err) {
@@ -38,6 +47,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
           text: SHARE_TEXT,
           url: shareUrl,
         });
+        trackShare();
         return true;
       } catch (err) {
         console.debug('Native share cancelled or failed:', err);
@@ -62,6 +72,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <MessageSquare size={18} />, 
       color: 'bg-[#25D366] text-white',
       action: () => {
+        trackShare();
         window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + shareUrl)}`, "_blank");
       }
     },
@@ -70,6 +81,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <Instagram size={18} />, 
       color: 'bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white',
       action: () => {
+        trackShare();
         window.open(`https://www.instagram.com/`, '_blank');
       }
     },
@@ -78,6 +90,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <Music2 size={18} />, 
       color: 'bg-black text-white border-white/20',
       action: () => {
+        trackShare();
         window.open(`https://www.tiktok.com/upload`, '_blank');
       }
     },
@@ -86,6 +99,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <Twitter size={18} />, 
       color: 'bg-black text-white border-white/10',
       action: () => {
+        trackShare();
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
       }
     },
@@ -94,6 +108,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <Facebook size={18} />, 
       color: 'bg-[#1877F2] text-white',
       action: () => {
+        trackShare();
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
       }
     },
@@ -102,6 +117,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <Send size={18} />, 
       color: 'bg-[#0088cc] text-white',
       action: () => {
+        trackShare();
         window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("FanatiqAI Artifact")}`, "_blank");
       }
     },
@@ -110,6 +126,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <ShareIcon size={18} />, 
       color: 'bg-[#FF4500] text-white',
       action: () => {
+        trackShare();
         window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent("FanatiqAI Artifact")}`, "_blank");
       }
     },
@@ -118,6 +135,7 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       icon: <Youtube size={18} />, 
       color: 'bg-[#FF0000] text-white',
       action: () => {
+        trackShare();
         window.open("https://www.youtube.com/upload", "_blank");
       }
     }

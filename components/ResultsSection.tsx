@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Download, Share2, History, MessageCircle, ShieldAlert, Globe, Sparkles, Hexagon } from 'lucide-react';
+import { Download, Share2, History, MessageCircle, ShieldAlert, Globe, Sparkles, Hexagon, CheckCircle2 } from 'lucide-react';
 import { UserTier } from '../lib/subscription-store';
 import { LEGAL_DISCLAIMER } from '../lib/legal-engine';
+import { galleryStore } from '../lib/gallery-store';
 import ShareModal from './ShareModal';
 
 interface Props {
@@ -16,21 +17,39 @@ interface Props {
 
 const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridColsOverride, hideHeader = false, starName }) => {
   const [shareData, setShareData] = useState<{ image: string; index: number } | null>(null);
-  const placeholders = Array(tier === 'pro' ? 4 : 1).fill(null);
+  const [manifestedIds, setManifestedIds] = useState<Set<number>>(new Set());
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const downloadImage = (base64Data: string, index: number) => {
+    const cleanName = (starName || 'legend').replace(/\s+/g, '-').toLowerCase();
     const link = document.createElement('a');
     link.href = base64Data;
-    link.download = `fanatiq-relic-${Date.now()}-${index}.png`;
+    link.download = `fanatiqai_${cleanName}_relic.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const handleManifest = (img: string, index: number) => {
+    if (manifestedIds.has(index)) return;
+    
+    galleryStore.saveArtifact(img, starName || 'Legend', 'Neural Prime', tier === 'pro');
+    setManifestedIds(prev => new Set(prev).add(index));
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
+  };
+
+  const placeholders = Array(tier === 'pro' ? 4 : 1).fill(null);
   const gridClass = gridColsOverride || "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
 
   return (
-    <div id="results" className="space-y-8">
+    <div id="results" className="space-y-8 relative">
+      {showSuccess && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[6000] px-8 py-4 bg-[#D4AF37] text-black rounded-2xl font-black text-[10px] tracking-[0.3em] uppercase flex items-center gap-3 shadow-[0_20px_50px_rgba(212,175,55,0.4)] animate-in fade-in slide-in-from-top-4">
+          <CheckCircle2 size={18} /> Artifact Synchronized to Legacy Vault
+        </div>
+      )}
+
       {isLoading && (
         <div className="relative w-full h-1 bg-neutral-950 rounded-full overflow-hidden border border-neutral-900 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
           <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#8B7326] w-[60%] animate-[progress:3s_ease-in-out_infinite] shadow-[0_0_25px_#D4AF37]" />
@@ -90,49 +109,62 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
                   </div>
                 </div>
 
-                <div className="absolute top-6 right-6 flex flex-col gap-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-5 group-hover:translate-x-0">
-                  <button 
-                    onClick={() => downloadImage(img, i)}
-                    className="p-3 bg-black/95 backdrop-blur-3xl rounded-xl border border-white/10 text-white hover:bg-[#D4AF37] hover:text-black transition-all shadow-2xl hover:scale-110"
-                    title="Download Relic"
-                  >
-                    <Download size={18} />
-                  </button>
-                  <button 
-                    onClick={() => setShareData({ image: img, index: i })}
-                    className="p-3 bg-black/95 backdrop-blur-3xl rounded-xl border border-white/10 text-white hover:bg-[#D4AF37] hover:text-black transition-all shadow-2xl hover:scale-110"
-                    title="Share Relic"
-                  >
-                    <Share2 size={18} />
-                  </button>
-                </div>
-
                 <div className="absolute bottom-6 right-6 text-right space-y-1">
                    <p className="text-[7px] font-black text-[#D4AF37] tracking-[0.2em] uppercase">99.8% NEURAL SYNC</p>
                 </div>
               </div>
 
-              <div className="p-6 bg-neutral-950 border-t border-neutral-900 space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="space-y-1">
-                    <span className="text-[7px] font-black tracking-[0.6em] text-[#D4AF37] uppercase">
-                      RESONANCE UNIT
-                    </span>
-                    <p className="text-white text-[10px] font-cinzel font-bold tracking-[0.1em] uppercase">COLLECTIBLE SPECIMEN</p>
+              {/* Enhanced Action Panel: Center-aligned, highly visible primary buttons */}
+              <div className="p-6 bg-neutral-950 border-t border-neutral-900 space-y-6">
+                <div className="flex items-center justify-center gap-4">
+                  <button 
+                    onClick={() => downloadImage(img, i)}
+                    className="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#8B7326] text-black text-[10px] font-black tracking-[0.2em] uppercase shadow-[0_10px_20px_rgba(212,175,55,0.2)] hover:shadow-[0_15px_30px_rgba(212,175,55,0.4)] hover:scale-[1.03] transition-all"
+                  >
+                    <Download size={16} /> Download Relic
+                  </button>
+                  <button 
+                    onClick={() => setShareData({ image: img, index: i })}
+                    className="flex-1 flex items-center justify-center gap-3 py-4 rounded-xl bg-neutral-900 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-black tracking-[0.2em] uppercase hover:bg-[#D4AF37] hover:text-black transition-all hover:shadow-[0_10px_20px_rgba(212,175,55,0.2)]"
+                  >
+                    <Share2 size={16} /> Share Relic
+                  </button>
+                </div>
+
+                <div className="flex justify-between items-center border-t border-neutral-900 pt-4">
+                  <div className="space-y-0.5">
+                    <span className="text-[6px] font-black tracking-[0.4em] text-[#D4AF37] uppercase">RESONANCE UNIT</span>
+                    <p className="text-white text-[9px] font-cinzel font-bold tracking-[0.1em] uppercase">COLLECTIBLE SPECIMEN</p>
                   </div>
                   <div className="flex gap-2">
-                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] transition-all">
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] transition-all" title="View History">
                       <History size={14} />
                     </button>
-                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] transition-all">
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] transition-all" title="Open Discussion">
                       <MessageCircle size={14} />
                     </button>
                   </div>
                 </div>
 
-                <button className="w-full py-3 bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black font-black text-[8px] rounded-lg tracking-[0.4em] uppercase shadow-lg hover:shadow-[#D4AF37]/30 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 group/publish">
-                  <Globe size={12} className="group-hover/publish:rotate-12 transition-transform" />
-                  MANIFEST IN LEGACY VAULT
+                <button 
+                  onClick={() => handleManifest(img, i)}
+                  disabled={manifestedIds.has(i)}
+                  className={`w-full py-3 text-black font-black text-[8px] rounded-lg tracking-[0.4em] uppercase shadow-lg transition-all flex items-center justify-center gap-2 group/publish ${
+                    manifestedIds.has(i)
+                      ? 'bg-neutral-800 text-neutral-500 cursor-default border border-neutral-700 shadow-none'
+                      : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
+                  }`}
+                >
+                  {manifestedIds.has(i) ? (
+                    <>
+                      <CheckCircle2 size={12} /> ARTIFACT ARCHIVED
+                    </>
+                  ) : (
+                    <>
+                      <Globe size={12} className="group-hover/publish:rotate-12 transition-transform" />
+                      MANIFEST IN LEGACY VAULT
+                    </>
+                  )}
                 </button>
               </div>
             </div>
