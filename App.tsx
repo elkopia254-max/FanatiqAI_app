@@ -17,7 +17,7 @@ import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
 import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
-import { Sparkles, X, Terminal, ShieldAlert, Award, Info, Power, RefreshCw, BookOpen, ScrollText, Trophy, Users, Shield, LifeBuoy, Scale, Copyright, AlertTriangle, ArrowRight, CheckCircle, Globe, Zap } from 'lucide-react';
+import { Sparkles, X, Terminal, ShieldAlert, Award, Info, Power, RefreshCw, BookOpen, ScrollText, Trophy, Users, Shield, LifeBuoy, Scale, Copyright, AlertTriangle, ArrowRight, CheckCircle, Globe, Zap, Gavel } from 'lucide-react';
 
 /**
  * Error Interpreter: Maps Gemini API errors to FanatiqAI Statuses
@@ -374,7 +374,7 @@ const App: React.FC = () => {
           ) : activeView === 'about' ? (
             <PageWrapper title="About FanatiqAI" subtitle="Neural Legacy Forge" icon={<Info />}><p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred. We believe fans should have a place to honor their idols through high-fidelity symbolic reinterpretations.</p><p>By blending advanced neural synthesis with specific trade iconography, we create relics that capture the essence of greatness without literal depiction.</p></PageWrapper>
           ) : activeView === 'goat' ? (
-            <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}><p>The G.O.A.T protocol evaluates the resonance of every manifest based on technical fidelity, symbolic accuracy, and community sentiment.</p><p>Artifacts with the highest neural sync achieve Zenith status and are immortalized in the legendary vault.</p></PageWrapper>
+            <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}><p>The G.O.A.T protocol evaluates the resonance of every manifest based on technical fidelity, symbolic accuracy, and community sentiment.</p></PageWrapper>
           ) : activeView === 'manifesto' ? (
             <PageWrapper title="Fanatiq Manifesto" subtitle="Core Neural Principles" icon={<BookOpen />}><p>Fandom is the fuel of legends. We stand for the right of every fan to manifest their tribute in the highest possible quality. We believe symbols carry more weight than literal images.</p></PageWrapper>
           ) : activeView === 'terms' ? (
@@ -391,6 +391,12 @@ const App: React.FC = () => {
              <PageWrapper title="Fan Rankings" icon={<Trophy />}><p>The most dedicated Fanatiqs earn their place in the upper echelons of the network. Ranking is based on the quality and engagement of your manifested relics.</p></PageWrapper>
           ) : activeView === 'levels' ? (
              <PageWrapper title="Creator Levels" icon={<Award />}><p>Unlock new archetypes and materials as you progress through the creator tiers. From Novice to Ascended, your journey is tracked in real-time.</p></PageWrapper>
+          ) : activeView === 'law' ? (
+             <PageWrapper title="The Neural Law" subtitle="Rewrite the Multiverse" icon={<Gavel />}><p>The Neural Law governs the creation of artifacts within the Fanatiq Network. It ensures that every tribute respects the legacy of the subjects while pushing the boundaries of symbolic art.</p><p>1. Symbolic Superiority: Icons must transcend literal depiction.<br/>2. Neural Integrity: Every manifest must undergo deep resonance sync.<br/>3. Legacy Preservation: Fanatiq relics are forever archived in the Obsidian Vault.</p></PageWrapper>
+          ) : activeView === 'rules' ? (
+             <PageWrapper title="Community Rules" icon={<ShieldAlert />}><p>To maintain the prestige of the Fanatiq Network, we enforce strict guidelines: 1. No harmful or explicit content. 2. Respect the symbolic nature of the forge. 3. Engage with the community in a spirit of shared fandom.</p></PageWrapper>
+          ) : activeView === 'report' ? (
+             <PageWrapper title="Report Abuse" icon={<AlertTriangle />}><p>If you encounter a manifested relic that violates our core neural principles or legal standards, please report it immediately via the encrypted channel below.</p></PageWrapper>
           ) : (
             <PageWrapper title={activeView.replace('-', ' ').toUpperCase()} icon={<Sparkles />}><p>This portal is currently synchronizing with the neural network. Please check back shortly.</p></PageWrapper>
           )}

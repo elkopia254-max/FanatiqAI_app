@@ -15,8 +15,8 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
   // Create a unique shareable link
   const shareUrl = `${window.location.origin}?relic=${encodeURIComponent(btoa(starName))}`;
   
-  // User Requested Share Text Template
-  const SHARE_TEXT = `I just forged a legendary symbolic relic on FanatiqAI ✨\nRewrite the Multiverse.\nView it here → `;
+  // User Requested Universal Share Text
+  const SHARE_TEXT = `I just forged a FanatiqAI artifact ✨ `;
 
   const copyToClipboard = async () => {
     try {
@@ -61,75 +61,64 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
       name: 'WhatsApp', 
       icon: <MessageSquare size={18} />, 
       color: 'bg-[#25D366] text-white',
-      action: async () => {
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + shareUrl)}`, "_blank");
+      action: () => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + shareUrl)}`, "_blank");
       }
     },
     { 
       name: 'Instagram', 
       icon: <Instagram size={18} />, 
       color: 'bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white',
-      action: async () => {
-        await copyToClipboard();
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.instagram.com/`, "_blank");
+      action: () => {
+        window.open(`https://www.instagram.com/`, '_blank');
       }
     },
     { 
       name: 'TikTok', 
       icon: <Music2 size={18} />, 
       color: 'bg-black text-white border-white/20',
-      action: async () => {
-        await copyToClipboard();
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.tiktok.com/upload?lang=en`, "_blank");
+      action: () => {
+        window.open(`https://www.tiktok.com/upload`, '_blank');
       }
     },
     { 
       name: 'X (Twitter)', 
       icon: <Twitter size={18} />, 
       color: 'bg-black text-white border-white/10',
-      action: async () => {
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
+      action: () => {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
       }
     },
     { 
       name: 'Facebook', 
       icon: <Facebook size={18} />, 
       color: 'bg-[#1877F2] text-white',
-      action: async () => {
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
+      action: () => {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
       }
     },
     { 
       name: 'Telegram', 
       icon: <Send size={18} />, 
       color: 'bg-[#0088cc] text-white',
-      action: async () => {
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(SHARE_TEXT)}`, "_blank");
+      action: () => {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent("FanatiqAI Artifact")}`, "_blank");
       }
     },
     { 
       name: 'Reddit', 
       icon: <ShareIcon size={18} />, 
       color: 'bg-[#FF4500] text-white',
-      action: async () => {
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent("Forged on FanatiqAI")}`, "_blank");
+      action: () => {
+        window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent("FanatiqAI Artifact")}`, "_blank");
       }
     },
     { 
       name: 'YouTube', 
       icon: <Youtube size={18} />, 
       color: 'bg-[#FF0000] text-white',
-      action: async () => {
-        await copyToClipboard();
-        const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.youtube.com/`, '_blank');
+      action: () => {
+        window.open("https://www.youtube.com/upload", "_blank");
       }
     }
   ];
