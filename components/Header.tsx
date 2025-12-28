@@ -14,6 +14,7 @@ interface Props {
   tier?: UserTier;
   activeView: ViewType;
   onViewChange: (view: ViewType) => void;
+  onCreateTribute?: () => void;
   onAuthClick: (mode: 'login' | 'signup') => void;
 }
 
@@ -66,7 +67,7 @@ const DigitalOscarLogo = ({ className = "w-20 h-20" }) => (
   </div>
 );
 
-const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAuthClick }) => {
+const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onCreateTribute, onAuthClick }) => {
   const [hoveredBtn, setHoveredBtn] = useState<'login' | 'signup' | 'upgrade' | 'create' | null>(null);
 
   const navItems = [
@@ -80,7 +81,11 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onAu
   };
 
   const handleCreateClick = () => {
-    onViewChange('home');
+    if (onCreateTribute) {
+      onCreateTribute();
+    } else {
+      onViewChange('home');
+    }
   };
 
   return (

@@ -143,7 +143,7 @@ const TimelineGenerator: React.FC<Props> = ({ artifact, isLoading }) => {
                <div className="w-28 h-28 rounded-[3rem] border border-neutral-800 flex items-center justify-center mb-12 group-hover:bg-[#D4AF37]/10 group-hover:border-[#D4AF37]/50 transition-all duration-1000 shadow-2xl group-hover:rotate-180">
                   <History className="text-neutral-800 group-hover:text-[#D4AF37] transition-all duration-1000" size={42} />
                </div>
-               <p className="text-neutral-600 font-cinzel text-xl tracking-[0.5em] uppercase group-hover:text-neutral-400 transition-all duration-1000 drop-shadow-lg">FORGE A STAR TO SYNC THEIR HISTORY</p>
+               <p className="text-neutral-600 font-cinzel text-xl tracking-[0.5em] uppercase group-hover:text-neutral-400 transition-all duration-1000 drop-shadow-lg">READY TO FORGE A NEW LEGEND</p>
             </div>
           )}
         </div>

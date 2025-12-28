@@ -22,6 +22,14 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
     if (initialConcept) {
       setConcept(initialConcept);
       handleInitialize(initialConcept);
+    } else {
+      // RESET CHAT DATA on null concept (session reset)
+      setProfile(null);
+      setMessages([]);
+      setConcept('');
+      setInputText('');
+      setIsTyping(false);
+      setIsInitializing(false);
     }
   }, [initialConcept]);
 
@@ -146,36 +154,38 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
   return (
     <div className={`w-full flex flex-col glass rounded-[3rem] overflow-hidden border border-neutral-800 shadow-[0_60px_120px_rgba(0,0,0,0.7)] animate-in fade-in duration-500 ${isSidebarMode ? 'h-[750px]' : 'max-w-5xl mx-auto h-[800px]'}`}>
       
-      {/* Legendary Header - Expanded to prevent truncation */}
-      <div className="px-6 md:px-10 py-8 border-b border-neutral-800/60 bg-neutral-950/90 flex justify-between items-center z-20">
-        <div className="flex items-center gap-4 md:gap-6 flex-1 min-w-0">
+      {/* Legendary Header - Optimized for single-line display with Tag Protection */}
+      <div className="px-5 md:px-8 py-6 border-b border-neutral-800/60 bg-neutral-950/90 flex justify-between items-center z-20">
+        <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
           <div className="relative group flex-shrink-0">
-            <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl border-2 border-[#D4AF37]/40 bg-neutral-900 p-0.5 shadow-2xl transition-all duration-700 group-hover:border-[#D4AF37]">
-               <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${profile.avatarSeed}`} alt="Legend" className="w-full h-full rounded-[12px] opacity-80" />
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl border border-[#D4AF37]/30 bg-neutral-900 p-0.5 shadow-xl transition-all duration-700 group-hover:border-[#D4AF37]">
+               <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${profile.avatarSeed}`} alt="Legend" className="w-full h-full rounded-[10px] opacity-80" />
             </div>
-            <div className="absolute -bottom-1 -right-1 w-3 md:w-4 h-3 md:h-4 bg-[#D4AF37] border-2 border-black rounded-full animate-pulse shadow-[0_0_20px_rgba(212,175,55,0.7)]" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 md:w-3 h-2.5 md:h-3 bg-[#D4AF37] border-2 border-black rounded-full animate-pulse shadow-[0_0_10px_rgba(212,175,55,0.7)]" />
           </div>
           <div className="flex flex-col min-w-0 flex-1">
-            <h4 className="font-cinzel font-bold text-sm md:text-base text-white tracking-[0.1em] md:tracking-[0.15em] uppercase leading-tight drop-shadow-md break-words">
-              {profile.name} – <span className="text-[#D4AF37] whitespace-nowrap">Prime Relic™</span>
+            <h4 className="font-cinzel font-bold text-xs md:text-sm text-white tracking-[0.1em] md:tracking-[0.15em] uppercase leading-none drop-shadow-md flex items-center min-w-0 overflow-hidden pr-2">
+              <span className="truncate">{profile.name}</span>
+              <span className="flex-shrink-0 text-neutral-500 mx-1">–</span>
+              <span className="flex-shrink-0 text-[#D4AF37]">Prime Relic™</span>
             </h4>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[8px] text-neutral-500 font-black tracking-[0.3em] md:tracking-[0.4em] uppercase opacity-80">
-                (Symbolic Tribute Persona)
+              <span className="text-[7px] text-neutral-600 font-black tracking-[0.2em] md:tracking-[0.3em] uppercase opacity-80 whitespace-nowrap">
+                Symbolic Tribute Persona
               </span>
             </div>
           </div>
         </div>
         <button 
           onClick={() => { setMessages([]); handleInitialize(profile.name); }}
-          className="p-3 rounded-2xl bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-all shadow-lg group ml-4 flex-shrink-0"
+          className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-all shadow-lg group ml-2 flex-shrink-0"
         >
-          <RefreshCw size={18} className="group-hover:rotate-180 transition-transform duration-700" />
+          <RefreshCw size={16} className="group-hover:rotate-180 transition-transform duration-700" />
         </button>
       </div>
 
       {/* Casual Dialogue Chamber */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 bg-neutral-950/40 custom-scrollbar">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-neutral-950/40 custom-scrollbar">
         {messages.map((m) => (
           <div key={m.id} className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'} animate-in slide-in-from-bottom-4 duration-500`}>
             <div 
@@ -202,12 +212,10 @@ const FanChat: React.FC<Props> = ({ initialConcept, isSidebarMode = false }) => 
         ))}
         
         {isTyping && (
-          <div className="flex flex-col items-start animate-in fade-in duration-500">
-            <div className="p-5 rounded-2xl bg-neutral-900/60 border border-neutral-800 rounded-tl-none flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" style={{ animationDelay: '0s' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" style={{ animationDelay: '0.2s' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" style={{ animationDelay: '0.4s' }} />
-            </div>
+          <div className="flex items-center gap-2 p-5 rounded-2xl bg-neutral-900/60 border border-neutral-800 rounded-tl-none animate-in fade-in duration-500">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" style={{ animationDelay: '0s' }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" style={{ animationDelay: '0.2s' }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-bounce" style={{ animationDelay: '0.4s' }} />
           </div>
         )}
       </div>

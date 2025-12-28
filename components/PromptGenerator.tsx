@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, ChevronDown, Timer, Layers, Circle, Square, Triangle, Activity, RefreshCw } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronDown, Timer, Layers, Circle, Square, Triangle, Activity, RefreshCw, ShieldAlert } from 'lucide-react';
 import { SubArchetypeFlavor, SUB_ARCHETYPES } from '../lib/style-library';
 import { UserTier } from '../lib/subscription-store';
 import { ForgeState } from '../lib/forge-state';
@@ -71,6 +71,7 @@ const PromptGenerator: React.FC<Props> = ({
 
   const archetypesList = Object.values(SUB_ARCHETYPES);
   const isProcessActive = forgeState === 'SEALED' || forgeState === 'FORGING' || forgeState === 'QUEUED';
+  const isOutOfCredits = !canGenerate && tier === 'free' && cooldown === 0;
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 sm:px-0 relative z-[100]">
@@ -143,7 +144,12 @@ const PromptGenerator: React.FC<Props> = ({
                 : 'bg-gradient-to-br from-[#D4AF37] via-[#F9E29C] to-[#8B7326] text-black shadow-xl hover:shadow-[#D4AF37]/40 hover:scale-[1.02] active:scale-95'
             }`}
           >
-            {forgeState === 'FORGING' ? (
+            {isOutOfCredits ? (
+              <span className="flex items-center gap-2">
+                <ShieldAlert size={14} className="text-black" />
+                UPGRADE NOW
+              </span>
+            ) : forgeState === 'FORGING' ? (
               <span className="flex items-center gap-3">
                 <div className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                 FORGING...

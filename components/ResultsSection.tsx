@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Download, Share2, History, MessageCircle, ShieldAlert, Globe, Sparkles, Hexagon } from 'lucide-react';
 import { UserTier } from '../lib/subscription-store';
 import { LEGAL_DISCLAIMER } from '../lib/legal-engine';
+import ShareModal from './ShareModal';
 
 interface Props {
   isLoading: boolean;
@@ -10,9 +11,11 @@ interface Props {
   tier: UserTier;
   gridColsOverride?: string;
   hideHeader?: boolean;
+  starName?: string | null;
 }
 
-const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridColsOverride, hideHeader = false }) => {
+const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridColsOverride, hideHeader = false, starName }) => {
+  const [shareData, setShareData] = useState<{ image: string; index: number } | null>(null);
   const placeholders = Array(tier === 'pro' ? 4 : 1).fill(null);
 
   const downloadImage = (base64Data: string, index: number) => {
@@ -91,10 +94,15 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
                   <button 
                     onClick={() => downloadImage(img, i)}
                     className="p-3 bg-black/95 backdrop-blur-3xl rounded-xl border border-white/10 text-white hover:bg-[#D4AF37] hover:text-black transition-all shadow-2xl hover:scale-110"
+                    title="Download Relic"
                   >
                     <Download size={18} />
                   </button>
-                  <button className="p-3 bg-black/95 backdrop-blur-3xl rounded-xl border border-white/10 text-white hover:bg-[#D4AF37] hover:text-black transition-all shadow-2xl hover:scale-110">
+                  <button 
+                    onClick={() => setShareData({ image: img, index: i })}
+                    className="p-3 bg-black/95 backdrop-blur-3xl rounded-xl border border-white/10 text-white hover:bg-[#D4AF37] hover:text-black transition-all shadow-2xl hover:scale-110"
+                    title="Share Relic"
+                  >
                     <Share2 size={18} />
                   </button>
                 </div>
@@ -134,7 +142,7 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
             <div className="w-24 h-24 border border-neutral-900 rounded-[2.5rem] flex items-center justify-center mb-10 text-neutral-800">
               <Sparkles size={40} />
             </div>
-            <p className="font-cinzel text-3xl text-neutral-800 tracking-[0.6em] uppercase text-center">AWAITING FORGE</p>
+            <p className="font-cinzel text-3xl text-neutral-800 tracking-[0.6em] uppercase text-center">READY TO CREATE A NEW TRIBUTE</p>
           </div>
         )}
       </div>
@@ -145,6 +153,15 @@ const ResultsSection: React.FC<Props> = ({ isLoading, images = [], tier, gridCol
             <span className="text-[#D4AF37]">DIGITAL COLLECTIBLE • NOT A HUMAN DEPICTION</span> • {LEGAL_DISCLAIMER}
           </p>
         </div>
+      )}
+
+      {shareData && (
+        <ShareModal 
+          isOpen={!!shareData} 
+          onClose={() => setShareData(null)} 
+          image={shareData.image} 
+          starName={starName || 'Legend'} 
+        />
       )}
     </div>
   );

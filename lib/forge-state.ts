@@ -11,15 +11,19 @@ export type ForgeState =
 
 export const FORGE_MESSAGES = {
   SUSPENDED: "The Forge is resting. Current formation capacity has been reached.",
-  FAILED: "Forge is busy or your network is unstable. Please try again in a few seconds.",
-  FORGING: "MANIFESTING ARTIFACT...",
+  FAILED: "Forge temporarily unavailable. Please try again shortly.",
+  FORGING: "FORGING ARTIFACT...",
   QUEUED: "CONVENING NEURAL RECURSION...",
   DORMANT: "FORGE CAPACITY: READY",
-  TIMEOUT: "Forge is busy or your network is unstable. Please try again in a few seconds.", 
-  QUOTA: "You’ve reached your Forge limit. Please wait or upgrade to continue forging.",
-  LOADING: "Forge is loading… please wait a moment.",
-  FAST_FORGE: "Fast Forge Mode Activated",
-  QUOTA_EXCEEDED: "Global Quota Exceeded. Switching to Symbolic Core."
+  TIMEOUT: "Forge response delayed. Stabilizing local symbolic preview...", 
+  QUOTA: "You’ve reached your free forge limit.",
+  UPGRADE_PROMPT: "Upgrade to continue creating legendary tributes.",
+  LOADING: "Aligning Neural Core...",
+  FAST_FORGE: "Fast Forge Mode: Generating Symbolic Persona...",
+  QUOTA_EXCEEDED: "Global Quota Busy. Manifesting Lightweight Symbolic Relic.",
+  API_LIMIT: "Neural API limits reached. Resynchronize or Upgrade.",
+  SERVER_BUSY: "Server cores are heavily loaded. Retrying connection...",
+  NETWORK_ERROR: "Neural network synchronization failed. Check your broadcast."
 };
 
 export interface ForgeLog {
