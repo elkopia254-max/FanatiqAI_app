@@ -15,10 +15,8 @@ const ShareModal: React.FC<Props> = ({ isOpen, onClose, image, starName }) => {
   // Create a unique shareable link
   const shareUrl = `${window.location.origin}?relic=${encodeURIComponent(btoa(starName))}`;
   
-  // Preferred Share Text Template
-  const SHARE_TEXT = `I just forged a legendary symbolic relic on FanatiqAI ✨
-Rewrite the Multiverse.
-View it here → `;
+  // User Requested Share Text Template
+  const SHARE_TEXT = `I just forged a legendary symbolic relic on FanatiqAI ✨\nRewrite the Multiverse.\nView it here → `;
 
   const copyToClipboard = async () => {
     try {
@@ -65,7 +63,7 @@ View it here → `;
       color: 'bg-[#25D366] text-white',
       action: async () => {
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + shareUrl)}`, '_blank');
+        if (!shared) window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT + shareUrl)}`, "_blank");
       }
     },
     { 
@@ -75,7 +73,7 @@ View it here → `;
       action: async () => {
         await copyToClipboard();
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.instagram.com/`, '_blank');
+        if (!shared) window.open(`https://www.instagram.com/`, "_blank");
       }
     },
     { 
@@ -85,7 +83,7 @@ View it here → `;
       action: async () => {
         await copyToClipboard();
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.tiktok.com/upload`, '_blank');
+        if (!shared) window.open(`https://www.tiktok.com/upload?lang=en`, "_blank");
       }
     },
     { 
@@ -94,7 +92,7 @@ View it here → `;
       color: 'bg-black text-white border-white/10',
       action: async () => {
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT + shareUrl)}`, '_blank');
+        if (!shared) window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
       }
     },
     { 
@@ -103,7 +101,7 @@ View it here → `;
       color: 'bg-[#1877F2] text-white',
       action: async () => {
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+        if (!shared) window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
       }
     },
     { 
@@ -112,7 +110,7 @@ View it here → `;
       color: 'bg-[#0088cc] text-white',
       action: async () => {
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(SHARE_TEXT)}`, '_blank');
+        if (!shared) window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(SHARE_TEXT)}`, "_blank");
       }
     },
     { 
@@ -121,7 +119,7 @@ View it here → `;
       color: 'bg-[#FF4500] text-white',
       action: async () => {
         const shared = await handleNativeShare();
-        if (!shared) window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(SHARE_TEXT)}`, '_blank');
+        if (!shared) window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent("Forged on FanatiqAI")}`, "_blank");
       }
     },
     { 

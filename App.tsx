@@ -17,10 +17,10 @@ import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
 import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
-import { Sparkles, X, Terminal, ShieldAlert, Award, Info, Power, RefreshCw, BookOpen, ScrollText, Trophy, Users, Shield, LifeBuoy, Scale, Copyright, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Sparkles, X, Terminal, ShieldAlert, Award, Info, Power, RefreshCw, BookOpen, ScrollText, Trophy, Users, Shield, LifeBuoy, Scale, Copyright, AlertTriangle, ArrowRight, CheckCircle, Globe, Zap } from 'lucide-react';
 
 /**
- * Error Interpreter: Maps raw API errors to FanatiqAI Statuses
+ * Error Interpreter: Maps Gemini API errors to FanatiqAI Statuses
  */
 function interpretGeminiError(err: any): { status: string } {
   const msg = err.message?.toLowerCase() || "";
@@ -62,7 +62,7 @@ const UpgradeNotification: React.FC<{ onDismiss: () => void; onUpgrade: () => vo
 );
 
 /**
- * Status Broadcast Notification
+ * Status Broadcast Notification for API/Process feedback
  */
 const ForgeStatusNotification: React.FC<{ message: string; status: string; onDismiss: () => void; onRetry?: () => void }> = ({ message, status, onDismiss, onRetry }) => {
   const isError = ['API_LIMIT', 'NETWORK_ERROR', 'SERVER_BUSY', 'FORGE_FAILED'].includes(status);
@@ -95,7 +95,7 @@ const ForgeStatusNotification: React.FC<{ message: string; status: string; onDis
 };
 
 /**
- * The Forge Veil (Loading Fog)
+ * The Forge Veil (High-fidelity loading screen)
  */
 const ForgeVeil: React.FC<{ isActive: boolean; status?: string | null; onDismantle: () => void }> = ({ isActive, status, onDismantle }) => {
   const [dots, setDots] = useState('');
@@ -135,7 +135,7 @@ const ForgeVeil: React.FC<{ isActive: boolean; status?: string | null; onDismant
 };
 
 /**
- * Standard Informational Page Wrapper
+ * Standard Informational Page Wrapper for all 20+ navigation views
  */
 const PageWrapper: React.FC<{ title: string; subtitle?: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, subtitle, icon, children }) => (
   <div className="py-20 max-w-6xl mx-auto px-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -213,7 +213,7 @@ const App: React.FC = () => {
     clearWatchdog();
     setActiveView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    console.debug("[FORGE] Session Resynchronized.");
+    console.debug("[FORGE] Session Resynchronized. Rewrite the Multiverse.");
   }, []);
 
   const resolveJob = useCallback((finalState: 'COMPLETED' | 'FAILED', status: string, message: string | null = null) => {
@@ -236,7 +236,6 @@ const App: React.FC = () => {
   }, [resolveJob]);
 
   const handleProUpgrade = async () => {
-    // Mandated by Gemini 3.0 Pro Rules: User must select their key
     if (typeof (window as any).aistudio?.openSelectKey === 'function') { 
       await (window as any).aistudio.openSelectKey(); 
     }
@@ -251,6 +250,7 @@ const App: React.FC = () => {
     
     const isPro = subState.tier === 'pro';
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // Use specialized image models for premium aesthetics
     const model = isPro ? 'gemini-3-pro-image-preview' : 'gemini-2.5-flash-image';
 
     try {
@@ -322,11 +322,25 @@ const App: React.FC = () => {
     <div className="min-h-screen granite-texture bg-[#0d0d0d] overflow-x-hidden font-inter relative">
       <div className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-1000" style={{ background: `radial-gradient(circle 600px at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.04), transparent)`, opacity: activeView === 'home' ? 1 : 0 }} />
       {showUpgradePanel && <UpgradeNotification onDismiss={() => setShowUpgradePanel(false)} onUpgrade={() => handleViewChange('pricing')} />}
-      <ForgeVeil isActive={forgeState === 'FORGING' && activeView === 'home' && !showUpgradePanel} status={statusMessage || (isFastForgeActive ? FORGE_MESSAGES.FAST_FORGE : FORGE_MESSAGES.LOADING)} onDismantle={() => { clearWatchdog(); setForgeState('DORMANT'); setCurrentStatus('DORMANT'); }} />
+      
+      {/* Universal Forge Veil for all Loading/Forging states */}
+      <ForgeVeil 
+        isActive={forgeState === 'FORGING' && activeView === 'home' && !showUpgradePanel} 
+        status={statusMessage || (isFastForgeActive ? FORGE_MESSAGES.FAST_FORGE : FORGE_MESSAGES.LOADING)} 
+        onDismantle={() => { clearWatchdog(); setForgeState('DORMANT'); setCurrentStatus('DORMANT'); }} 
+      />
+      
       <Header tier={subState.tier} activeView={activeView} onViewChange={handleViewChange} onCreateTribute={resetForgeSession} onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }} />
       
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 relative z-10">
-        {statusMessage && currentStatus !== 'LOADING' && <ForgeStatusNotification onDismiss={() => setStatusMessage(null)} message={statusMessage} status={currentStatus} onRetry={() => beginFormation(chatConcept || persistedPrompt, persistedArchetype)} />}
+        {statusMessage && currentStatus !== 'LOADING' && (
+          <ForgeStatusNotification 
+            onDismiss={() => setStatusMessage(null)} 
+            message={statusMessage} 
+            status={currentStatus} 
+            onRetry={() => beginFormation(chatConcept || persistedPrompt, persistedArchetype)} 
+          />
+        )}
         
         <div key={activeView} className="view-transition">
           {activeView === 'home' ? (
@@ -358,9 +372,25 @@ const App: React.FC = () => {
           ) : activeView === 'pricing' ? (
             <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />
           ) : activeView === 'about' ? (
-            <PageWrapper title="About FanatiqAI" subtitle="Neural Legacy Forge" icon={<Info />}><p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred. We believe fans should have a place to honor their idols through high-fidelity reinterpretations.</p></PageWrapper>
+            <PageWrapper title="About FanatiqAI" subtitle="Neural Legacy Forge" icon={<Info />}><p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred. We believe fans should have a place to honor their idols through high-fidelity symbolic reinterpretations.</p><p>By blending advanced neural synthesis with specific trade iconography, we create relics that capture the essence of greatness without literal depiction.</p></PageWrapper>
           ) : activeView === 'goat' ? (
-            <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}><p>The G.O.A.T protocol evaluates the resonance of every manifest based on technical fidelity and fan sentiment.</p></PageWrapper>
+            <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}><p>The G.O.A.T protocol evaluates the resonance of every manifest based on technical fidelity, symbolic accuracy, and community sentiment.</p><p>Artifacts with the highest neural sync achieve Zenith status and are immortalized in the legendary vault.</p></PageWrapper>
+          ) : activeView === 'manifesto' ? (
+            <PageWrapper title="Fanatiq Manifesto" subtitle="Core Neural Principles" icon={<BookOpen />}><p>Fandom is the fuel of legends. We stand for the right of every fan to manifest their tribute in the highest possible quality. We believe symbols carry more weight than literal images.</p></PageWrapper>
+          ) : activeView === 'terms' ? (
+            <PageWrapper title="Terms of Service" icon={<Scale />}><p>By accessing the Forge, you agree to respect the symbolic integrity of all manifested relics. Use of the service constitutes agreement to our fair-use policies.</p></PageWrapper>
+          ) : activeView === 'privacy' ? (
+            <PageWrapper title="Privacy Policy" icon={<Shield />}><p>Your neural inputs and session data are encrypted using Fanatiq standard protocols. We never store personal biometric data.</p></PageWrapper>
+          ) : activeView === 'copyright' ? (
+            <PageWrapper title="Copyright & Ownership" icon={<Copyright />}><p>While FanatiqAI owns the neural models, the fans own the legacy of the tributes they manifest. These are digital collectibles intended for fan expression.</p></PageWrapper>
+          ) : activeView === 'support' ? (
+            <PageWrapper title="Support Hub" icon={<LifeBuoy />}><p>Need assistance with your manifest? Our neural support team is available 24/7 via the encrypted channel.</p></PageWrapper>
+          ) : activeView === 'how-it-works' ? (
+             <PageWrapper title="How it Works" icon={<Zap />}><p>The Fanatiq process involves three stages: 1. Input Resonance, 2. Neural Formation, 3. Legacy Manifestation. Each relic is unique to your session.</p></PageWrapper>
+          ) : activeView === 'rankings' ? (
+             <PageWrapper title="Fan Rankings" icon={<Trophy />}><p>The most dedicated Fanatiqs earn their place in the upper echelons of the network. Ranking is based on the quality and engagement of your manifested relics.</p></PageWrapper>
+          ) : activeView === 'levels' ? (
+             <PageWrapper title="Creator Levels" icon={<Award />}><p>Unlock new archetypes and materials as you progress through the creator tiers. From Novice to Ascended, your journey is tracked in real-time.</p></PageWrapper>
           ) : (
             <PageWrapper title={activeView.replace('-', ' ').toUpperCase()} icon={<Sparkles />}><p>This portal is currently synchronizing with the neural network. Please check back shortly.</p></PageWrapper>
           )}
