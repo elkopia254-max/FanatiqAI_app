@@ -16,12 +16,12 @@ export const FORGE_MESSAGES = {
   QUEUED: "CONVENING NEURAL RECURSION...",
   DORMANT: "FORGE CAPACITY: READY",
   TIMEOUT: "Forge response delayed. Stabilizing local symbolic preview...", 
-  QUOTA: "You’ve reached your free forge limit.",
-  UPGRADE_PROMPT: "Upgrade to continue creating legendary tributes.",
+  QUOTA: "OUT OF CREDITS",
+  UPGRADE_PROMPT: "You’ve used all free daily forges. Upgrade to Ascended to unlock unlimited relics, rare styles, zero latency, and private vault access.",
   LOADING: "Aligning Neural Core...",
   FAST_FORGE: "Fast Forge Mode: Generating Symbolic Persona...",
   QUOTA_EXCEEDED: "Global Quota Busy. Manifesting Lightweight Symbolic Relic.",
-  API_LIMIT: "Neural API limits reached. Resynchronize or Upgrade.",
+  API_LIMIT: "OUT OF CREDITS",
   SERVER_BUSY: "Server cores are heavily loaded. Retrying connection...",
   NETWORK_ERROR: "Neural network synchronization failed. Check your broadcast."
 };

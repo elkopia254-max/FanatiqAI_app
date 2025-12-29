@@ -91,20 +91,22 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onCr
   return (
     <header className="sticky top-0 z-50 glass border-b border-[#D4AF37]/30 transition-all duration-200">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-6">
-        <div className="flex justify-between items-center h-24 py-4">
+        <div className="flex justify-between items-center h-24">
           
           <div 
             id="brandLogo"
-            className="flex items-center space-x-3 group cursor-pointer flex-shrink-0"
+            className="flex items-center gap-2 md:gap-3 group cursor-pointer flex-shrink-0"
             onClick={handleLogoClick}
           >
-            <DigitalOscarLogo className="w-16 h-16 md:w-20 md:h-20" />
-            <div className="flex flex-col">
-              <h1 className="text-xl md:text-2xl font-cinzel font-bold tracking-[0.2em] text-[#D4AF37] leading-none drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
+            <div className="flex items-center justify-center">
+              <DigitalOscarLogo className="w-14 h-14 md:w-20 md:h-20" />
+            </div>
+            <div className="flex flex-col justify-center">
+              <h1 className="text-lg md:text-2xl font-cinzel font-bold tracking-[0.2em] text-[#D4AF37] leading-none drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
                 FANATIQ<span className="text-white transition-colors group-hover:text-[#D4AF37]">AI</span>
               </h1>
               {tier === 'pro' && (
-                <div className="flex items-center gap-1.5 text-[8px] font-black tracking-[0.4em] text-[#D4AF37] mt-2 uppercase opacity-90 drop-shadow-sm">
+                <div className="flex items-center gap-1.5 text-[7px] md:text-[8px] font-black tracking-[0.4em] text-[#D4AF37] mt-1.5 md:mt-2 uppercase opacity-90 drop-shadow-sm">
                   <Crown size={8} className="fill-[#D4AF37]" /> ASCENDED
                 </div>
               )}
@@ -128,7 +130,7 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onCr
             ))}
           </nav>
 
-          <div className="flex items-center space-x-4 xl:space-x-6 flex-shrink-0">
+          <div className="flex items-center space-x-3 md:space-x-4 xl:space-x-6 flex-shrink-0">
             
             <button 
               onClick={() => onViewChange('pricing')}
@@ -162,14 +164,15 @@ const Header: React.FC<Props> = ({ tier = 'free', activeView, onViewChange, onCr
               onClick={handleCreateClick}
               onMouseEnter={() => setHoveredBtn('create')}
               onMouseLeave={() => setHoveredBtn(null)}
-              className={`px-6 md:px-8 py-3 rounded-xl border transition-all duration-300 font-black text-[10px] tracking-[0.3em] uppercase flex items-center gap-3 group/create ${
+              className={`px-4 md:px-8 py-2.5 md:py-3 rounded-xl border transition-all duration-300 font-black text-[9px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase flex items-center gap-2 md:gap-3 group/create ${
                 activeView === 'home' 
                   ? 'bg-[#D4AF37] text-black border-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.6)]' 
                   : 'border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black hover:border-[#D4AF37] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]'
               }`}
             >
               <Sparkles size={14} className={activeView === 'home' ? 'fill-black' : 'group-hover/create:rotate-12 transition-transform'} />
-              CREATE TRIBUTE
+              <span className="hidden xs:inline">CREATE TRIBUTE</span>
+              <span className="xs:hidden">CREATE</span>
             </button>
           </div>
         </div>

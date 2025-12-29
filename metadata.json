@@ -1,5 +1,8 @@
 {
   "name": "FanatiqAI",
   "description": "A premium dark-luxury AI platform with charcoal granite aesthetics and metallic gold accents for creative prompt generation and community sharing.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
 }

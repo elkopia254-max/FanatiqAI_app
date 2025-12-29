@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Check, Star, ShieldCheck, ArrowRight, X, CreditCard, Smartphone, CheckCircle2 } from 'lucide-react';
 import { UserTier } from '../lib/subscription-store';
@@ -10,7 +11,7 @@ interface Props {
 const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [method, setMethod] = useState<'mpesa' | 'stripe' | 'paypal' | null>(null);
+  const [method, setMethod] = useState<'mpesa' | 'stripe' | 'paypal' | null>('stripe');
 
   const handlePayment = async () => {
     setIsProcessing(true);

@@ -17,45 +17,53 @@ import { useSubscription } from './lib/subscription-store';
 import { generateTimeline, TimelineArtifact } from './lib/timeline-engine';
 import { categories } from './components/CategoriesGrid';
 import { ForgeState, FORGE_MESSAGES, logForgeEvent } from './lib/forge-state';
-import { Sparkles, X, Terminal, ShieldAlert, Award, Info, Power, RefreshCw, BookOpen, ScrollText, Trophy, Users, Shield, LifeBuoy, Scale, Copyright, AlertTriangle, ArrowRight, CheckCircle, Globe, Zap, Gavel } from 'lucide-react';
+import { Sparkles, X, Terminal, ShieldAlert, Award, Info, Power, RefreshCw, BookOpen, ScrollText, Trophy, Users, Shield, LifeBuoy, Scale, Copyright, AlertTriangle, ArrowRight, CheckCircle, Globe, Zap, Gavel, Clock, Plus } from 'lucide-react';
 
 /**
- * Error Interpreter: Maps Gemini API errors to FanatiqAI Statuses
+ * Error Interpreter: Maps Gemini API and Platform errors to FanatiqAI Statuses
  */
 function interpretGeminiError(err: any): { status: string } {
   const msg = err.message?.toLowerCase() || "";
-  if (msg.includes("quota")) return { status: "API_LIMIT" };
-  if (msg.includes("exceeded")) return { status: "OUT_OF_CREDITS" };
+  if (msg.includes("quota") || msg.includes("exceeded") || msg.includes("billing") || msg.includes("project") || msg.includes("entity was not found")) {
+    return { status: "OUT_OF_CREDITS" };
+  }
   if (msg.includes("network") || msg.includes("fetch")) return { status: "NETWORK_ERROR" };
   if (msg.includes("timeout") || msg.includes("busy")) return { status: "SERVER_BUSY" };
   return { status: "FORGE_FAILED" };
 }
 
 /**
- * Premium Upgrade Alert
+ * FanatiqAI Native Credit Gate / Upgrade Notification
  */
 const UpgradeNotification: React.FC<{ onDismiss: () => void; onUpgrade: () => void }> = ({ onDismiss, onUpgrade }) => (
-  <div className="fixed top-32 left-1/2 -translate-x-1/2 z-[5000] px-8 py-6 rounded-[2.5rem] bg-black border-2 border-[#D4AF37] shadow-[0_30px_90px_rgba(212,175,55,0.4)] animate-in fade-in slide-in-from-top-4 duration-500 flex flex-col md:flex-row items-center gap-6 min-w-[320px] max-w-lg backdrop-blur-2xl">
-    <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/30 flex-shrink-0">
-      <ShieldAlert size={28} />
-    </div>
-    <div className="flex-1 text-center md:text-left">
-      <p className="text-[12px] font-black tracking-[0.2em] text-[#D4AF37] uppercase mb-1">
-        CREDITS EXHAUSTED
-      </p>
-      <p className="text-neutral-400 text-[10px] font-medium tracking-wide leading-relaxed">
-        {FORGE_MESSAGES.UPGRADE_PROMPT}
-      </p>
-    </div>
-    <div className="flex gap-3">
-      <button 
-        onClick={onUpgrade}
-        className="px-6 py-3 bg-[#D4AF37] text-black text-[10px] font-black tracking-[0.2em] rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl flex items-center gap-2 uppercase"
-      >
-        Upgrade Now <ArrowRight size={14} />
-      </button>
-      <button onClick={onDismiss} className="p-3 text-neutral-600 hover:text-white transition-colors">
-        <X size={18} />
+  <div className="fixed inset-0 z-[11000] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-500">
+    <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={onDismiss} />
+    <div className="relative w-full max-w-lg px-8 py-10 rounded-[3rem] bg-[#050505] border-2 border-[#D4AF37] shadow-[0_40px_100px_rgba(212,175,55,0.4)] flex flex-col items-center text-center gap-8 backdrop-blur-3xl animate-in zoom-in-95 duration-500">
+      <div className="w-20 h-20 rounded-3xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/30 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+        <ShieldAlert size={40} />
+      </div>
+      <div className="space-y-4">
+        <h3 className="text-3xl font-cinzel font-bold text-white tracking-[0.2em] uppercase">OUT OF CREDITS</h3>
+        <p className="text-neutral-400 text-sm font-medium tracking-wide leading-relaxed max-w-sm">
+          {FORGE_MESSAGES.UPGRADE_PROMPT}
+        </p>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
+        <button 
+          onClick={() => { onUpgrade(); }}
+          className="flex-1 px-8 py-5 bg-gradient-to-br from-[#D4AF37] via-[#F9E29C] to-[#8B7326] text-black text-[11px] font-black tracking-[0.3em] rounded-2xl hover:scale-[1.03] active:scale-95 transition-all shadow-2xl flex items-center justify-center gap-3 uppercase"
+        >
+          <Sparkles size={16} /> Upgrade Now
+        </button>
+        <button 
+          onClick={onDismiss} 
+          className="flex-1 px-8 py-5 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white text-[11px] font-black tracking-[0.3em] rounded-2xl transition-all uppercase flex items-center justify-center gap-3"
+        >
+          <Clock size={16} /> Maybe Later
+        </button>
+      </div>
+      <button onClick={onDismiss} className="absolute top-6 right-6 p-2 text-neutral-600 hover:text-white transition-colors">
+        <X size={20} />
       </button>
     </div>
   </div>
@@ -109,34 +117,33 @@ const ForgeVeil: React.FC<{ isActive: boolean; status?: string | null; onDismant
   
   return (
     <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.05)_0%,transparent_80%)]" />
-      <button onClick={onDismantle} className="absolute top-10 right-10 z-50 p-4 bg-black/60 border border-white/10 rounded-full text-white/40 hover:text-[#D4AF37] transition-all group flex items-center gap-3">
-        <span className="text-[8px] font-black tracking-[0.3em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">Dismantle Veil</span>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-2xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.1)_0%,transparent_80%)] animate-pulse" />
+      <button onClick={onDismantle} className="absolute top-10 right-10 z-[10001] p-4 bg-black/60 border border-white/10 rounded-full text-white/40 hover:text-[#D4AF37] transition-all group flex items-center gap-3">
+        <span className="text-[8px] font-black tracking-[0.3em] uppercase opacity-0 group-hover:opacity-100 transition-opacity">Abort Formation</span>
         <Power size={20} />
       </button>
       <div className="relative z-10 flex flex-col items-center text-center space-y-12 max-w-lg">
         <div className="relative">
-          <div className="w-24 h-24 rounded-full border-[0.5px] border-[#D4AF37]/30 border-t-[#D4AF37] animate-spin-slow shadow-[0_0_40px_rgba(212,175,55,0.1)]" />
-          <Sparkles className="absolute inset-0 m-auto text-[#D4AF37] animate-pulse" size={30} />
+          <div className="w-32 h-32 rounded-full border-[1px] border-[#D4AF37]/20 border-t-[#D4AF37] animate-spin-slow shadow-[0_0_60px_rgba(212,175,55,0.2)]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+             <Sparkles className="text-[#D4AF37] animate-pulse" size={40} />
+          </div>
         </div>
         <div className="space-y-4">
-          <h3 className="text-2xl font-cinzel font-bold text-white tracking-[0.2em] uppercase drop-shadow-xl">Forging Resonance</h3>
-          <div className="flex items-center justify-center gap-3 text-[9px] font-black tracking-[0.4em] text-[#D4AF37] uppercase bg-black/60 px-6 py-2 rounded-full border border-[#D4AF37]/30 shadow-2xl backdrop-blur-xl">
+          <h3 className="text-3xl font-cinzel font-bold text-white tracking-[0.2em] uppercase drop-shadow-[0_0_20px_rgba(212,175,55,0.3)]">SYNTHESIZING REALITY</h3>
+          <div className="flex items-center justify-center gap-3 text-[10px] font-black tracking-[0.5em] text-[#D4AF37] uppercase bg-black/60 px-8 py-3 rounded-full border border-[#D4AF37]/30 shadow-2xl backdrop-blur-xl">
             <Terminal size={12} /> {status || FORGE_MESSAGES.LOADING}{dots}
           </div>
         </div>
-        <div className="w-48 h-[1px] bg-black/20 relative overflow-hidden rounded-full">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#D4AF37] animate-progress" />
+        <div className="w-64 h-[2px] bg-white/5 relative overflow-hidden rounded-full">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-progress" />
         </div>
       </div>
     </div>
   );
 };
 
-/**
- * Standard Informational Page Wrapper for all 20+ navigation views
- */
 const PageWrapper: React.FC<{ title: string; subtitle?: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, subtitle, icon, children }) => (
   <div className="py-20 max-w-6xl mx-auto px-4 animate-in fade-in slide-in-from-bottom-8 duration-700">
     <div className="glass p-10 md:p-20 rounded-[4rem] border-[#D4AF37]/20 shadow-2xl relative overflow-hidden min-h-[600px]">
@@ -145,15 +152,15 @@ const PageWrapper: React.FC<{ title: string; subtitle?: string; icon: React.Reac
       </div>
       <div className="relative z-10 space-y-12">
         <div className="space-y-4 text-center md:text-left">
-          <h2 className="text-xl md:text-2xl font-cinzel font-bold tracking-[0.2em] text-white uppercase drop-shadow-xl">
+          <h2 className="text-3xl md:text-4xl font-cinzel font-bold tracking-[0.2em] text-white uppercase drop-shadow-xl">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-[9px] font-black tracking-[0.5em] text-[#D4AF37] uppercase opacity-80">
+            <p className="text-[10px] font-black tracking-[0.5em] text-[#D4AF37] uppercase opacity-80">
               {subtitle}
             </p>
           )}
-          <div className="w-16 h-[1px] bg-[#D4AF37] mx-auto md:mx-0" />
+          <div className="w-20 h-[1px] bg-[#D4AF37] mx-auto md:mx-0" />
         </div>
         <div className="prose prose-invert max-w-none prose-p:text-neutral-400 prose-p:leading-relaxed prose-p:text-lg prose-p:font-light prose-headings:font-cinzel prose-headings:text-white">
           {children}
@@ -213,7 +220,6 @@ const App: React.FC = () => {
     clearWatchdog();
     setActiveView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    console.debug("[FORGE] Session Resynchronized. Rewrite the Multiverse.");
   }, []);
 
   const resolveJob = useCallback((finalState: 'COMPLETED' | 'FAILED', status: string, message: string | null = null) => {
@@ -223,7 +229,10 @@ const App: React.FC = () => {
     setForgeState(finalState);
     setCurrentStatus(status);
     setStatusMessage(message);
-    if (finalState === 'FAILED') {
+    if (status === 'OUT_OF_CREDITS') {
+      setShowUpgradePanel(true);
+      setForgeState('DORMANT');
+    } else if (finalState === 'FAILED') {
       setTimeout(() => { setForgeState('DORMANT'); setCurrentStatus('DORMANT'); }, 5000);
     }
   }, []);
@@ -250,7 +259,6 @@ const App: React.FC = () => {
     
     const isPro = subState.tier === 'pro';
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    // Use specialized image models for premium aesthetics
     const model = isPro ? 'gemini-3-pro-image-preview' : 'gemini-2.5-flash-image';
 
     try {
@@ -274,6 +282,8 @@ const App: React.FC = () => {
   };
 
   const beginFormation = async (starInput: string, archetype: SubArchetypeFlavor) => {
+    if (!starInput.trim()) return;
+    
     setForgeState("FORGING"); 
     setCurrentStatus("LOADING");
 
@@ -297,43 +307,51 @@ const App: React.FC = () => {
       setTimelineArtifact(timeline); 
       recordGeneration(); 
       resolveJob('COMPLETED', 'SUCCESS');
-      setTimeout(() => document.getElementById('results-dashboard')?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } else if (result.status === 'OUT_OF_CREDITS') {
-      setShowUpgradePanel(true);
-      resolveJob('FAILED', 'OUT_OF_CREDITS');
-    } else if (result.status === 'SERVER_BUSY') {
-      resolveJob('FAILED', 'SERVER_BUSY', FORGE_MESSAGES.SERVER_BUSY);
-    } else if (result.status === 'NETWORK_ERROR') {
-      resolveJob('FAILED', 'NETWORK_ERROR', FORGE_MESSAGES.NETWORK_ERROR);
-    } else if (result.status === 'API_LIMIT') {
-      resolveJob('FAILED', 'API_LIMIT', FORGE_MESSAGES.API_LIMIT);
+      setTimeout(() => {
+        const resultsEl = document.getElementById('results-dashboard');
+        if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
     } else {
-      resolveJob('FAILED', 'FORGE_FAILED', FORGE_MESSAGES.FAILED);
+      resolveJob('FAILED', result.status, (result as any).message || FORGE_MESSAGES.FAILED);
     }
   };
 
   const handleViewChange = (view: ViewType) => {
     if (view === 'join') { setAuthMode('signup'); setIsAuthModalOpen(true); return; }
     setActiveView(view); 
+    setShowUpgradePanel(false); // Ensure modal is closed when navigating to Pricing
     window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   return (
-    <div className="min-h-screen granite-texture bg-[#0d0d0d] overflow-x-hidden font-inter relative">
-      <div className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-1000" style={{ background: `radial-gradient(circle 600px at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.04), transparent)`, opacity: activeView === 'home' ? 1 : 0 }} />
+    <div className="min-h-screen granite-texture bg-[#050505] overflow-x-hidden font-inter relative selection:bg-[#D4AF37] selection:text-black">
+      {/* Global Mouse Glow Overlay */}
+      <div 
+        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-1000" 
+        style={{ 
+          background: `radial-gradient(circle 800px at ${mousePos.x}px ${mousePos.y}px, rgba(212, 175, 55, 0.05), transparent)`, 
+          opacity: activeView === 'home' ? 1 : 0 
+        }} 
+      />
+      
       {showUpgradePanel && <UpgradeNotification onDismiss={() => setShowUpgradePanel(false)} onUpgrade={() => handleViewChange('pricing')} />}
       
-      {/* Universal Forge Veil for all Loading/Forging states */}
       <ForgeVeil 
         isActive={forgeState === 'FORGING' && activeView === 'home' && !showUpgradePanel} 
         status={statusMessage || (isFastForgeActive ? FORGE_MESSAGES.FAST_FORGE : FORGE_MESSAGES.LOADING)} 
         onDismantle={() => { clearWatchdog(); setForgeState('DORMANT'); setCurrentStatus('DORMANT'); }} 
       />
       
-      <Header tier={subState.tier} activeView={activeView} onViewChange={handleViewChange} onCreateTribute={resetForgeSession} onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }} />
+      <Header 
+        tier={subState.tier} 
+        activeView={activeView} 
+        onViewChange={handleViewChange} 
+        onCreateTribute={resetForgeSession} 
+        onAuthClick={(m) => { setAuthMode(m); setIsAuthModalOpen(true); }} 
+      />
       
-      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 relative z-10">
-        {statusMessage && currentStatus !== 'LOADING' && (
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 relative z-10">
+        {statusMessage && currentStatus !== 'LOADING' && currentStatus !== 'OUT_OF_CREDITS' && (
           <ForgeStatusNotification 
             onDismiss={() => setStatusMessage(null)} 
             message={statusMessage} 
@@ -344,21 +362,50 @@ const App: React.FC = () => {
         
         <div key={activeView} className="view-transition">
           {activeView === 'home' ? (
-            <div className="space-y-16">
+            <div className="space-y-24">
               <Hero selectedCategoryId={selectedCategoryId} onCategorySelect={(id) => { setSelectedCategoryId(id); if (forgeState === 'DORMANT') setForgeState('CONVENING'); }} />
-              <section id="forgeContainer" className="space-y-8">
-                <PromptGenerator onGenerate={beginFormation} forgeState={forgeState} tier={subState.tier} cooldown={subState.cooldownRemaining} canGenerate={canGenerate} initialPrompt={persistedPrompt} initialArchetype={persistedArchetype} onPromptChange={setPersistedPrompt} onArchetypeChange={setPersistedArchetype} onInputFocus={() => { if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') setForgeState('CONVENING'); }} />
+              
+              <section id="forgeContainer" className="space-y-12">
+                <PromptGenerator 
+                  onGenerate={beginFormation} 
+                  forgeState={forgeState} 
+                  tier={subState.tier} 
+                  cooldown={subState.cooldownRemaining} 
+                  canGenerate={canGenerate} 
+                  initialPrompt={persistedPrompt} 
+                  initialArchetype={persistedArchetype} 
+                  onPromptChange={setPersistedPrompt} 
+                  onArchetypeChange={setPersistedArchetype} 
+                  onInputFocus={() => { if (forgeState === 'DORMANT' || forgeState === 'COMPLETED') setForgeState('CONVENING'); }} 
+                />
                 <UsageTracker state={subState} forgeState={forgeState} onUpgradeClick={() => handleViewChange('pricing')} />
               </section>
+
               {forgeState === 'COMPLETED' && (
-                <div id="results-dashboard" className="space-y-16 animate-in fade-in slide-in-from-bottom-12 duration-1000">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900/50 pb-10">
-                    <h3 className="text-4xl md:text-5xl font-cinzel font-bold tracking-[0.4em] uppercase filter drop-shadow-[0_10px_15px_rgba(0,0,0,0.8)]"><span className="text-white">ICONIC</span> <span className="text-[#D4AF37]">VISION</span></h3>
+                <div id="results-dashboard" className="space-y-24 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-900/50 pb-12">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3 text-[#D4AF37] text-[10px] font-black tracking-[0.5em] uppercase">
+                        <Sparkles size={14} fill="#D4AF37" /> PHASE 2.0 ACTIVE
+                      </div>
+                      <h3 className="text-4xl md:text-6xl font-cinzel font-bold tracking-[0.3em] uppercase filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
+                        <span className="text-white">ICONIC</span> <span className="text-[#D4AF37]">VISION</span>
+                      </h3>
+                    </div>
+                    <div className="bg-neutral-950/80 px-8 py-4 rounded-2xl border border-neutral-900 backdrop-blur-md">
+                       <p className="text-[10px] font-black tracking-[0.4em] text-neutral-400 uppercase">Resonance: <span className="text-[#D4AF37]">99.9%</span></p>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                    <div className="lg:col-span-6"><ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1" hideHeader={true} starName={chatConcept} /></div>
-                    <div className="lg:col-span-6 lg:sticky lg:top-32"><FanChat initialConcept={chatConcept} isSidebarMode={true} /></div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+                    <div className="lg:col-span-6">
+                      <ResultsSection isLoading={false} images={generatedImages} tier={subState.tier} gridColsOverride="grid-cols-1" hideHeader={true} starName={chatConcept} />
+                    </div>
+                    <div className="lg:col-span-6 lg:sticky lg:top-36">
+                      <FanChat initialConcept={chatConcept} isSidebarMode={true} />
+                    </div>
                   </div>
+                  
                   <TimelineGenerator artifact={timelineArtifact} isLoading={false} />
                 </div>
               )}
@@ -366,42 +413,28 @@ const App: React.FC = () => {
           ) : activeView === 'fanchat' || activeView === 'fan-chat' ? (
             <div className="py-20"><FanChat initialConcept={chatConcept} /></div>
           ) : activeView === 'trending' || activeView === 'clubs-top' || activeView === 'tributes-legendary' ? (
-            <Gallery title={activeView === 'trending' ? "Trending G.O.A.Ts" : activeView === 'clubs-top' ? "Elite Clubs" : "Legendary Vault"} type="trending" />
+            <Gallery title={activeView === 'trending' ? "Zenith Rankings" : activeView === 'clubs-top' ? "Elite Clubs" : "Legendary Vault"} type="trending" />
           ) : activeView === 'community' || activeView === 'fan-book' || activeView === 'tributes-new' ? (
             <Gallery title={activeView === 'fan-book' ? "The Fan Book" : "New Manifestations"} type="community" />
           ) : activeView === 'pricing' ? (
             <Pricing currentTier={subState.tier} onSelect={subState.tier === 'free' ? handleProUpgrade : downgradeToFree} />
           ) : activeView === 'about' ? (
-            <PageWrapper title="About FanatiqAI" subtitle="Neural Legacy Forge" icon={<Info />}><p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred. We believe fans should have a place to honor their idols through high-fidelity symbolic reinterpretations.</p><p>By blending advanced neural synthesis with specific trade iconography, we create relics that capture the essence of greatness without literal depiction.</p></PageWrapper>
-          ) : activeView === 'goat' ? (
-            <PageWrapper title="What is G.O.A.T?" subtitle="Greatest of All Time Protocol" icon={<Award />}><p>The G.O.A.T protocol evaluates the resonance of every manifest based on technical fidelity, symbolic accuracy, and community sentiment.</p></PageWrapper>
-          ) : activeView === 'manifesto' ? (
-            <PageWrapper title="Fanatiq Manifesto" subtitle="Core Neural Principles" icon={<BookOpen />}><p>Fandom is the fuel of legends. We stand for the right of every fan to manifest their tribute in the highest possible quality. We believe symbols carry more weight than literal images.</p></PageWrapper>
-          ) : activeView === 'terms' ? (
-            <PageWrapper title="Terms of Service" icon={<Scale />}><p>By accessing the Forge, you agree to respect the symbolic integrity of all manifested relics. Use of the service constitutes agreement to our fair-use policies.</p></PageWrapper>
-          ) : activeView === 'privacy' ? (
-            <PageWrapper title="Privacy Policy" icon={<Shield />}><p>Your neural inputs and session data are encrypted using Fanatiq standard protocols. We never store personal biometric data.</p></PageWrapper>
-          ) : activeView === 'copyright' ? (
-            <PageWrapper title="Copyright & Ownership" icon={<Copyright />}><p>While FanatiqAI owns the neural models, the fans own the legacy of the tributes they manifest. These are digital collectibles intended for fan expression.</p></PageWrapper>
-          ) : activeView === 'support' ? (
-            <PageWrapper title="Support Hub" icon={<LifeBuoy />}><p>Need assistance with your manifest? Our neural support team is available 24/7 via the encrypted channel.</p></PageWrapper>
-          ) : activeView === 'how-it-works' ? (
-             <PageWrapper title="How it Works" icon={<Zap />}><p>The Fanatiq process involves three stages: 1. Input Resonance, 2. Neural Formation, 3. Legacy Manifestation. Each relic is unique to your session.</p></PageWrapper>
-          ) : activeView === 'rankings' ? (
-             <PageWrapper title="Fan Rankings" icon={<Trophy />}><p>The most dedicated Fanatiqs earn their place in the upper echelons of the network. Ranking is based on the quality and engagement of your manifested relics.</p></PageWrapper>
-          ) : activeView === 'levels' ? (
-             <PageWrapper title="Creator Levels" icon={<Award />}><p>Unlock new archetypes and materials as you progress through the creator tiers. From Novice to Ascended, your journey is tracked in real-time.</p></PageWrapper>
-          ) : activeView === 'law' ? (
-             <PageWrapper title="The Neural Law" subtitle="Rewrite the Multiverse" icon={<Gavel />}><p>The Neural Law governs the creation of artifacts within the Fanatiq Network. It ensures that every tribute respects the legacy of the subjects while pushing the boundaries of symbolic art.</p><p>1. Symbolic Superiority: Icons must transcend literal depiction.<br/>2. Neural Integrity: Every manifest must undergo deep resonance sync.<br/>3. Legacy Preservation: Fanatiq relics are forever archived in the Obsidian Vault.</p></PageWrapper>
-          ) : activeView === 'rules' ? (
-             <PageWrapper title="Community Rules" icon={<ShieldAlert />}><p>To maintain the prestige of the Fanatiq Network, we enforce strict guidelines: 1. No harmful or explicit content. 2. Respect the symbolic nature of the forge. 3. Engage with the community in a spirit of shared fandom.</p></PageWrapper>
-          ) : activeView === 'report' ? (
-             <PageWrapper title="Report Abuse" icon={<AlertTriangle />}><p>If you encounter a manifested relic that violates our core neural principles or legal standards, please report it immediately via the encrypted channel below.</p></PageWrapper>
+            <PageWrapper title="The Multiverse Protocol" subtitle="Neural Legacy Forge" icon={<Info />}><p>FanatiqAI was founded on a singular principle: The spirit of fandom is sacred. We believe fans should have a place to honor their idols through high-fidelity symbolic reinterpretations.</p><p className="mt-6">By utilizing advanced neural synthesis, we manifest icons as unique digital collectibles, stripping away literalism to capture the essence of greatness.</p></PageWrapper>
           ) : (
-            <PageWrapper title={activeView.replace('-', ' ').toUpperCase()} icon={<Sparkles />}><p>This portal is currently synchronizing with the neural network. Please check back shortly.</p></PageWrapper>
+            <PageWrapper title={activeView.replace('-', ' ').toUpperCase()} icon={<Sparkles />}><p>This portal is currently synchronizing with the neural network. Please check back shortly for full access.</p></PageWrapper>
           )}
         </div>
       </main>
+
+      {/* Floating Action Button for Mobile Create */}
+      <button 
+        onClick={resetForgeSession}
+        className="fixed bottom-8 right-8 z-[200] lg:hidden w-16 h-16 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#8B7326] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+        title="Create New Tribute"
+      >
+        <Plus size={30} />
+      </button>
+
       <Footer onViewChange={handleViewChange} />
       <AuthModals isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} initialMode={authMode} />
     </div>
