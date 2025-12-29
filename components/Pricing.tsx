@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Check, Star, ShieldCheck, ArrowRight, X, CreditCard, Smartphone, CheckCircle2 } from 'lucide-react';
+import { Check, Star, ShieldCheck, ArrowRight, X, CreditCard, Smartphone, CheckCircle2, Zap, Eye, Lock, ZapOff } from 'lucide-react';
 import { UserTier } from '../lib/subscription-store';
 
 interface Props {
@@ -31,10 +31,10 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
           SECURE PROTOCOL ACTIVE
         </div>
         <h2 className="text-4xl md:text-7xl font-cinzel font-bold text-white uppercase tracking-[0.1em] leading-tight">
-          CHOOSE YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#8B7326]">LEGACY</span>
+          ASCEND YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F9E29C] to-[#8B7326]">LEGACY</span>
         </h2>
         <p className="text-neutral-500 max-w-2xl mx-auto font-light text-lg md:text-xl leading-relaxed">
-          Unlock the full spectrum of high-fidelity AI synthesis with our premium membership tiers.
+          Unlock the full spectrum of high-fidelity AI synthesis. Choose between temporary manifestations or permanent elite relics.
         </p>
       </div>
 
@@ -42,27 +42,26 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
         {/* Free Plan */}
         <div className={`glass p-8 md:p-12 rounded-[2.5rem] border flex flex-col hover-lift bg-neutral-900/20 transition-all duration-700 ${currentTier === 'free' ? 'border-[#D4AF37]/30 shadow-2xl' : 'border-neutral-800/50 opacity-60'}`}>
           <div className="mb-10">
-            <h3 className="text-xl font-cinzel font-bold text-neutral-400 mb-4 tracking-[0.3em] uppercase">INITIATE</h3>
+            <h3 className="text-xl font-cinzel font-bold text-neutral-400 mb-4 tracking-[0.3em] uppercase">INITIATE (FREE)</h3>
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-black text-white">$0</span>
-              <span className="text-neutral-600 text-[10px] font-black tracking-[0.2em] uppercase">/ FREEFOREVER</span>
+              <span className="text-neutral-600 text-[10px] font-black tracking-[0.2em] uppercase">/ TEMPORARY</span>
             </div>
           </div>
           
           <ul className="space-y-5 mb-12 flex-1">
             {[
-              '3 Daily Generations',
-              'Single Vision Output',
-              'Standard Precision',
-              'Global Watermark',
-              'Neural Cooldown Active',
-              'Public Feed Access'
+              { label: '3 Daily Generations', icon: <Check size={12} className="text-neutral-600" /> },
+              { label: 'Global Watermark Required', icon: <ZapOff size={12} className="text-neutral-600" /> },
+              { label: 'Neural Cooldown Latency', icon: <Lock size={12} className="text-neutral-600" /> },
+              { label: 'Public Feed Only', icon: <Eye size={12} className="text-neutral-600" /> },
+              { label: 'Standard Styles Only', icon: <Check size={12} className="text-neutral-600" /> }
             ].map((feature, i) => (
               <li key={i} className="flex items-center gap-4 text-[10px] font-black tracking-[0.2em] text-neutral-500 uppercase">
                 <div className="w-5 h-5 rounded-lg bg-neutral-900 flex items-center justify-center flex-shrink-0 border border-neutral-800">
-                  <Check size={12} className="text-neutral-600" />
+                  {feature.icon}
                 </div>
-                {feature}
+                {feature.label}
               </li>
             ))}
           </ul>
@@ -76,7 +75,7 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
                 : 'border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/50'
             }`}
           >
-            {currentTier === 'free' ? 'CURRENT ARCHETYPE' : 'RETURN TO FREE'}
+            {currentTier === 'free' ? 'CURRENT ARCHETYPE' : 'RETURN TO TEMPORARY'}
           </button>
         </div>
 
@@ -97,26 +96,26 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
             </div>
             <div className="flex items-baseline gap-2 text-white">
               <span className="text-5xl font-black">$10</span>
-              <span className="text-neutral-500 text-[10px] font-black tracking-[0.2em] uppercase">/ MONTHLY</span>
+              <span className="text-neutral-500 text-[10px] font-black tracking-[0.2em] uppercase">/ PERMANENT</span>
             </div>
           </div>
           
           <ul className="space-y-5 mb-12 flex-1">
             {[
-              'Unlimited Generations',
-              'Quad-Vision Outputs',
-              'Hyper-Precision Mode',
-              'Pure Identity (No Watermarks)',
-              'Zero Neural Latency',
-              'Timeline Artifact Access',
-              'Rare Style Unlocks',
-              'Priority Server Core'
+              { label: 'Unlimited Neural Forges', icon: <CheckCircle2 size={12} className="text-black" /> },
+              { label: 'Zero Neural Latency', icon: <Zap size={12} className="text-black" /> },
+              { label: 'Pure Identity (No Watermarks)', icon: <CheckCircle2 size={12} className="text-black" /> },
+              { label: 'Private Relic Vault', icon: <Lock size={12} className="text-black" /> },
+              { label: 'Rare Style Unlocks', icon: <Star size={12} className="text-black" /> },
+              { label: 'Verified Creator Badge', icon: <CheckCircle2 size={12} className="text-black" /> },
+              { label: 'Priority Hall Placement', icon: <ArrowRight size={12} className="text-black" /> },
+              { label: 'Rankings Multiplier (1.5x)', icon: <Zap size={12} className="text-black" /> }
             ].map((feature, i) => (
               <li key={i} className="flex items-center gap-4 text-[10px] font-black tracking-[0.2em] text-white/80 uppercase">
                 <div className="w-5 h-5 rounded-lg bg-[#D4AF37] flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-                  <CheckCircle2 size={12} className="text-black" />
+                  {feature.icon}
                 </div>
-                {feature}
+                {feature.label}
               </li>
             ))}
           </ul>
@@ -131,7 +130,7 @@ const Pricing: React.FC<Props> = ({ currentTier, onSelect }) => {
           >
             {currentTier === 'pro' ? 'CANCEL SESSION' : (
               <>
-                ASCEND TO PRO
+                ASCEND NOW
                 <ArrowRight size={18} className="transition-transform duration-500 group-hover:translate-x-1" />
               </>
             )}

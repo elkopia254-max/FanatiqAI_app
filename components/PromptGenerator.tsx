@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, ChevronDown, Timer, Layers, Circle, Square, Triangle, Activity, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronDown, Timer, Layers, Circle, Square, Triangle, Activity, RefreshCw, ShieldAlert, Lock } from 'lucide-react';
 import { SubArchetypeFlavor, SUB_ARCHETYPES } from '../lib/style-library';
 import { UserTier } from '../lib/subscription-store';
 import { ForgeState } from '../lib/forge-state';
@@ -16,6 +16,8 @@ interface Props {
   initialArchetype?: SubArchetypeFlavor;
   onPromptChange?: (val: string) => void;
   onArchetypeChange?: (val: SubArchetypeFlavor) => void;
+  onUpgradeClick?: () => void;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 const ArchetypeIcon = ({ type, className }: { type: string, className?: string }) => {
@@ -38,7 +40,9 @@ const PromptGenerator: React.FC<Props> = ({
   initialPrompt = '',
   initialArchetype = 'classical',
   onPromptChange,
-  onArchetypeChange
+  onArchetypeChange,
+  onUpgradeClick,
+  inputRef
 }) => {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [selectedStyle, setSelectedStyle] = useState<SubArchetypeFlavor>(initialArchetype);
@@ -58,6 +62,10 @@ const PromptGenerator: React.FC<Props> = ({
   };
 
   const handleArchetypeUpdate = (val: SubArchetypeFlavor) => {
+    if (tier !== 'pro' && val !== 'classical') {
+      onUpgradeClick?.();
+      return;
+    }
     setSelectedStyle(val);
     onArchetypeChange?.(val);
   };
@@ -72,6 +80,7 @@ const PromptGenerator: React.FC<Props> = ({
   const archetypesList = Object.values(SUB_ARCHETYPES);
   const isProcessActive = forgeState === 'SEALED' || forgeState === 'FORGING' || forgeState === 'QUEUED';
   const isOutOfCredits = !canGenerate && tier === 'free' && cooldown === 0;
+  const isPro = tier === 'pro';
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 sm:px-0 relative z-[100]">
@@ -106,16 +115,23 @@ const PromptGenerator: React.FC<Props> = ({
                 <div className="absolute top-[calc(100%+16px)] left-0 w-full md:w-[520px] glass rounded-[3rem] overflow-hidden border border-[#D4AF37]/40 z-[120] shadow-[0_40px_100px_rgba(0,0,0,0.95)] animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 backdrop-blur-3xl">
                   <div className="p-5 md:p-7 bg-[#050505]/95">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {archetypesList.map((s) => (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => { handleArchetypeUpdate(s.id as SubArchetypeFlavor); setIsDropdownOpen(false); }}
-                          className={`group/item text-left p-6 rounded-[2rem] transition-all duration-300 flex flex-col items-start border relative overflow-hidden ${selectedStyle === s.id ? 'bg-[#D4AF37] border-transparent scale-[1.03]' : 'text-neutral-400 hover:text-white hover:bg-white/[0.05] border-neutral-900'}`}
-                        >
-                          <span className={`text-[12px] font-black tracking-[0.2em] uppercase mb-1 font-cinzel ${selectedStyle === s.id ? 'text-black' : 'text-white'}`}>{s.label}</span>
-                        </button>
-                      ))}
+                      {archetypesList.map((s) => {
+                        const isLocked = !isPro && s.id !== 'classical';
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => handleArchetypeUpdate(s.id as SubArchetypeFlavor)}
+                            className={`group/item text-left p-6 rounded-[2rem] transition-all duration-300 flex flex-col items-start border relative overflow-hidden ${selectedStyle === s.id ? 'bg-[#D4AF37] border-transparent scale-[1.03]' : 'text-neutral-400 hover:text-white hover:bg-white/[0.05] border-neutral-900'}`}
+                          >
+                            <div className="flex items-center justify-between w-full mb-1">
+                              <span className={`text-[12px] font-black tracking-[0.2em] uppercase font-cinzel ${selectedStyle === s.id ? 'text-black' : 'text-white'}`}>{s.label}</span>
+                              {isLocked && <Lock size={12} className="text-[#D4AF37]/60" />}
+                            </div>
+                            {isLocked && <span className="text-[7px] text-[#D4AF37]/40 font-black tracking-[0.2em] uppercase">ASCENDED ONLY</span>}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -125,6 +141,7 @@ const PromptGenerator: React.FC<Props> = ({
 
           <div className="flex-1 px-4 sm:px-8 relative py-3 md:py-0 min-w-0 flex items-center gap-5">
             <input
+              ref={inputRef}
               id="starNameInput"
               type="text"
               value={prompt}
@@ -147,7 +164,7 @@ const PromptGenerator: React.FC<Props> = ({
             {isOutOfCredits ? (
               <span className="flex items-center gap-2">
                 <ShieldAlert size={14} className="text-black" />
-                UPGRADE NOW
+                ASCEND LEGACY
               </span>
             ) : forgeState === 'FORGING' ? (
               <span className="flex items-center gap-3">
@@ -161,12 +178,12 @@ const PromptGenerator: React.FC<Props> = ({
             ) : cooldown > 0 && tier !== 'pro' ? (
               <span className="flex items-center gap-2">
                 <Timer size={14} className="animate-pulse" />
-                {Math.ceil(cooldown / 1000)}s
+                LATENCY: {Math.ceil(cooldown / 1000)}s
               </span>
             ) : (
               <>
                 <Sparkles size={16} className={`transition-transform duration-500 ${forgeState === 'CONVENING' ? 'scale-110 text-black' : 'opacity-40 group-hover/btn:rotate-12 group-hover/btn:scale-110'}`} />
-                Forge Accolade
+                {isPro ? 'INSTANT FORGE' : 'Forge Accolade'}
                 <ArrowRight size={16} className="transition-transform duration-500 group-hover/btn:translate-x-1" />
               </>
             )}

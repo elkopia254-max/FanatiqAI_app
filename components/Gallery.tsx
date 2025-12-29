@@ -2,13 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, MessageSquare, ExternalLink, Sparkle, ShieldCheck, Hexagon, RefreshCw, Sparkles, Zap, Eye, Share2, Crown } from 'lucide-react';
 import { galleryStore, Artifact, calculatePowerScore } from '../lib/gallery-store';
+import { UserTier } from '../lib/subscription-store';
 
 interface Props {
   title: string;
   type: 'trending' | 'community';
+  tier?: UserTier;
 }
 
-const Gallery: React.FC<Props> = ({ title, type }) => {
+const Gallery: React.FC<Props> = ({ title, type, tier }) => {
   const [items, setItems] = useState<Artifact[]>([]);
   const [isScanning, setIsScanning] = useState(false);
 
@@ -104,7 +106,7 @@ const Gallery: React.FC<Props> = ({ title, type }) => {
                       </span>
                     </div>
                     <span className="text-[7px] text-[#D4AF37] font-black tracking-[0.4em] uppercase mt-2">
-                      {item.isPro ? 'PRO POWER SCORE (1.5X)' : 'POWER SCORE'}
+                      {item.isPro ? 'ASCENDED POWER (1.5X)' : 'POWER SCORE'}
                     </span>
                   </div>
 
@@ -170,7 +172,7 @@ const Gallery: React.FC<Props> = ({ title, type }) => {
                       </div>
                       <div className="flex items-center gap-3 text-[#D4AF37]/60">
                         <ShieldCheck size={16} />
-                        <span className="text-[8px]">AUTHENTICATED</span>
+                        <span className="text-[8px]">{item.isPro ? 'ASCENDED AUTHENTIC' : 'AUTHENTICATED'}</span>
                       </div>
                     </div>
                   </div>

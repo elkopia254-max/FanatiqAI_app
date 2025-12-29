@@ -10,20 +10,21 @@ export type ForgeState =
   | 'FAILED';    // Terminal: FAIL
 
 export const FORGE_MESSAGES = {
-  SUSPENDED: "The Forge is resting. Current formation capacity has been reached.",
-  FAILED: "Forge temporarily unavailable. Please try again shortly.",
+  SUSPENDED: "THE FORGE IS RESTING. CAPACITY REACHED.",
+  FAILED: "FORGE UNAVAILABLE. OUR SERVERS ARE CURRENTLY STABILIZING.",
+  STABILIZING_SUB: "PLEASE TRY AGAIN SHORTLY — OR ASCEND FOR PRIORITY ACCESS.",
   FORGING: "FORGING ARTIFACT...",
   QUEUED: "CONVENING NEURAL RECURSION...",
   DORMANT: "FORGE CAPACITY: READY",
-  TIMEOUT: "Forge response delayed. Stabilizing local symbolic preview...", 
+  TIMEOUT: "FORGE DISCORDANCE. CONNECTION STABILIZING...", 
   QUOTA: "OUT OF CREDITS",
-  UPGRADE_PROMPT: "You’ve used all free daily forges. Upgrade to Ascended to unlock unlimited relics, rare styles, zero latency, and private vault access.",
-  LOADING: "Aligning Neural Core...",
-  FAST_FORGE: "Fast Forge Mode: Generating Symbolic Persona...",
-  QUOTA_EXCEEDED: "Global Quota Busy. Manifesting Lightweight Symbolic Relic.",
+  UPGRADE_PROMPT: "You’ve used all free daily forges. Upgrade to Ascended to unlock unlimited relic creation, rare styles, zero latency, and private vault access.",
+  LOADING: "ALIGNING NEURAL CORE...",
+  FAST_FORGE: "FAST FORGE MODE: GENERATING SYMBOLIC PERSONA...",
+  QUOTA_EXCEEDED: "OUT OF CREDITS",
   API_LIMIT: "OUT OF CREDITS",
-  SERVER_BUSY: "Server cores are heavily loaded. Retrying connection...",
-  NETWORK_ERROR: "Neural network synchronization failed. Check your broadcast."
+  SERVER_BUSY: "FORGE OVERLOAD. STABILIZING NEURAL CORES...",
+  NETWORK_ERROR: "SYNC FAILURE. SERVER RE-STABILIZING."
 };
 
 export interface ForgeLog {

@@ -13,14 +13,7 @@ const StageIcon = ({ type, isVerified }: { type: string, isVerified: boolean }) 
   }
 };
 
-const getRomanNumeral = (index: number) => {
-  switch (index) {
-    case 0: return 'I';
-    case 1: return 'II';
-    case 2: return 'III';
-    default: return (index + 1).toString();
-  }
-};
+const STAGE_LABELS = ['ASCENT', 'ZENITH', 'LEGACY'];
 
 const TimelineCard: React.FC<{ stage: TimelineStage; index: number; isSymbolic?: boolean }> = ({ stage, index, isSymbolic }) => (
   <div className={`bg-neutral-950/60 p-8 md:p-10 rounded-[3rem] border transition-all duration-700 hover:translate-y-[-10px] hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] group/card backdrop-blur-2xl ${isSymbolic ? 'border-[#D4AF37]/30 border-dashed' : 'border-neutral-900/80 hover:border-[#D4AF37]/40'}`}>
@@ -39,7 +32,7 @@ const TimelineCard: React.FC<{ stage: TimelineStage; index: number; isSymbolic?:
             </div>
           )}
         </div>
-        <span className="text-[9px] font-black text-[#D4AF37] tracking-[0.6em] uppercase mb-2 drop-shadow-sm">STAGE {getRomanNumeral(index)}</span>
+        <span className="text-[9px] font-black text-[#D4AF37] tracking-[0.6em] uppercase mb-2 drop-shadow-sm">{STAGE_LABELS[index] || 'MILESTONE'}</span>
         <span className="text-neutral-500 text-[10px] font-bold tracking-[0.4em] uppercase">{stage.year}</span>
       </div>
       <div className={`p-4 bg-black/80 rounded-2xl border transition-all duration-500 shadow-2xl group-hover/card:scale-115 group-hover/card:rotate-6 ${isSymbolic ? 'border-[#D4AF37]/40 shadow-[#D4AF37]/20' : 'border-neutral-800 group-hover/card:shadow-[#D4AF37]/30'}`}>
@@ -72,7 +65,7 @@ const TimelineGenerator: React.FC<Props> = ({ artifact, isLoading }) => {
             CHRONICLE OF ASCENSION
           </div>
           <h2 className="text-4xl md:text-6xl font-cinzel font-bold leading-tight tracking-[0.2em] uppercase drop-shadow-2xl">
-            <span className="text-white">TEMPORAL</span> <span className="text-[#D4AF37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">MAP</span>
+            <span className="text-white">ICONIC</span> <span className="text-[#D4AF37] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">TIMELINE</span>
           </h2>
           <p className="text-neutral-500 font-light text-base max-w-2xl mx-auto leading-relaxed italic tracking-widest opacity-80 uppercase text-[11px]">
             "Factual career highlights meeting symbolic legacy projections."
@@ -110,7 +103,7 @@ const TimelineGenerator: React.FC<Props> = ({ artifact, isLoading }) => {
                 <div className="p-6 rounded-2xl bg-neutral-900/40 border border-[#D4AF37]/10 flex items-start gap-4">
                    <Info size={20} className="text-[#D4AF37] shrink-0 mt-1" />
                    <p className="text-[10px] text-neutral-500 font-bold tracking-wide leading-relaxed uppercase opacity-70">
-                     Stage III is a symbolic fan projection and is not intended to represent verified real-world events or predictions. It is for creative tribute purposes only.
+                     The Legacy stage is a symbolic fan projection and is not intended to represent verified real-world events or predictions. It is for creative tribute purposes only.
                    </p>
                 </div>
               </div>
